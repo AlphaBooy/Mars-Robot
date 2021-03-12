@@ -18,4 +18,46 @@ Le but du projet est de réaliser un simulateur du parcours du robot qui compren
 - De sauvegarder les résultats obtenus dans des fichiers. Le fichier obtenu comprendra une liste des instructions exécutées par le robot, ainsi que le score final obtenu.
 
 ## Deuxième partie : Les combats !
-TODO
+### L'environement
+L'environement est composé de :
+- Une grille de n x m pouvant contenir les éléments suivants :
+    - Un mur '#'
+    - Rien ' '
+    - Un robot '@'
+    - Une batterie de rechange '%'
+- Une pile publique partagée entre tous les robots
+- x robots répartis sur la grille
+
+### Les robots
+Chaque robot a une énergie MAX (=10). Un robot ayant une énergie nulle est détruit.
+Chaque robot possède deux registres :
+- D : stockage de données
+- C : exécution du code
+Ces deux registres sont initialisés à 0.
+
+Le robot contient un programme qui peut utiliser plusieurs instructions :
+- P : pousse la valeur ASCII du caractère en mémoire se trouvant à la position d (où d est la valeur du registre D) sur la pile publique (tous les robots partagent la même pile)
+- G : récupère 2 valeurs de la pile, réalise un modulo de leurs valeurs par 2, effectue un NAND sur ces deux valeurs puis pousse le résultat.
+- D : définit le registre D (et non la valeur en mémoire résidant en D) à la valeur dépilée de la pile publique.
+- M : définit le caractère en mémoire situé à la position d sur la valeur ASCII de la valeur dépilée.
+- K : met le registre C sur d et D sur 0
+- Y : suivant le code ASCII (noté V) du caractère en mémoire à la position d, effectue une des actions suivantes :
+    - V = 32 se déplace à droite sur la grille sauf si bloqué par un mur ;
+    - V = 33 se déplace en haut sur la grille sauf si bloqué par un mur ;
+    - V = 34 se déplace à gauche sur la grille à moins d’être bloqué par un mur ;
+    - V = 35 se déplace en bas sur la grille à moins d’être bloqué par un mur ;
+    - V = 36 inflige un point d’énergie à tous les robots situés à proximité (horizontalement, verticalement, en diagonale ou sur sa position), y compris le robot ayant lancé cette commande ;
+    - V = 37 rend 1 point d’énergie pour chaque robot à proximité (horizontalement, verticalement, en diagonale ou sur sa position), mais leur donne 2 points d’énergie chacun ;
+    - V = 38 détruit les murs à proximité, coûtant 1 point d’énergie pour chaque mur.
+- I : d´epile 2 valeurs, x et y, de la pile, puis empile le caract`ere qui se trouve sur la grille aux coordonnées x et y.
+- Toute autre commande fait exploser le robot.
+
+A chaque tour, l’instruction dans le programme du robot à la position C est exécutée, puis le registre C est incrémenté de 1.
+
+### Fonctionnalités
+
+La plateforme à réaliser doit pouvoir :
+- Paramétrer l’environnement où évolue les robots. On ne s’intéressera qu’à des environnements définis (dans le dossier ”cartes”, par exemple, sous forme de fichiers textes). La plateforme devra donc dans un premier temps de choisir l’environnement à charger parmi ceux présents dans le dossier.
+- Charger les robots du dossier bots. Un robot est composé d’un nom et d’une chaîne texte représentant son programme, séparés par un espace.
+- Lancer la simulation : il faut réaliser un module de visualisation des résultats de la simulation en cours ;
+- Sauvegarder la liste des robots qui ont surv´ecu.
