@@ -25,7 +25,7 @@ public class MapObject {
      * Ex: Base [x:2, y:5, @]
      * @return a String that represent the given MapObject
      */
-    public static String toString() {
+    public String toString() {
         return name + " [x:" + posX + ", y:" + posY + ", " + mapRepresentation + "]";
     }
 
@@ -36,6 +36,6 @@ public class MapObject {
      * @return the MapObject found on the given position, null otherwise
      */
     public static MapObject getObject(int posX, int posY) {
-        //TODO
+        return null;
     }
 }
