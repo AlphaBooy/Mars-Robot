@@ -20,6 +20,39 @@ public class MapObject {
         this.mapRepresentation = mapRepresentation;
     }
 
+    public MapObject(int posX, int posY, char mapRepresentation) {
+        this.posX = posX;
+        this.posY = posY;
+        this.mapRepresentation = mapRepresentation;
+        this.name = getName(mapRepresentation);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getName(char representation) {
+        switch (representation) {
+            case '*':
+                return "Diamant";
+            case '%':
+                return "Rocher dur";
+            case '.':
+                return "Sable";
+            case ':':
+                return "Gres";
+            case '=':
+                return "Roche volcanique";
+            case '-':
+                return "Petit rocher";
+            case '#':
+                return "Rubis";
+            case '@':
+                return "Base";
+        }
+        return "";
+    }
+
     /**
      * Return a printable String that can be displayed to represent a MapObject
      * Ex: Base [x:2, y:5, @]
@@ -29,13 +62,4 @@ public class MapObject {
         return name + " [x:" + posX + ", y:" + posY + ", " + mapRepresentation + "]";
     }
 
-    /**
-     * Get the MapObject from it's coordinates
-     * @param posX It's position on the X axis
-     * @param posY It's position on the Y axis
-     * @return the MapObject found on the given position, null otherwise
-     */
-    public static MapObject getObject(int posX, int posY) {
-        return null;
-    }
 }

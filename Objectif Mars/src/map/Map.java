@@ -20,11 +20,7 @@ public class Map {
     public Map(char[][] representation) {
         sizeX = representation[0].length;
         sizeY = representation.length;
-        for (int i = 0; i < sizeY; i++) {
-            for (int j = 0; j < sizeX; j++) {
-                this.map[i][j] = new MapObject(i, j, "test", representation[i][j]);
-            }
-        }
+        generateObjects();
     }
 
     /**
@@ -41,6 +37,7 @@ public class Map {
         this.sizeX = 40;
         this.sizeY = 20;
         getRepresentation("C:\\Users\\clem2\\Desktop\\Cours\\JAVA\\projet\\Objectif Mars\\files\\maps\\zone_1.txt");
+        generateObjects();
     }
 
     /**
@@ -55,15 +52,25 @@ public class Map {
             int numLigne = 0, numColonne = 0;
             this.representation = new char[21][41];
             while ((charRead = fr.read()) != -1) {
-                this.representation[numLigne][numColonne] = (char) charRead;
-                numColonne++;
-                if (numColonne > this.sizeX) {
+                if (charRead == '\n') {
                     numLigne++;
                     numColonne = 0;
+                } else {
+                    this.representation[numLigne][numColonne] = (char) charRead;
+                    numColonne++;
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void generateObjects() {
+        this.map = new MapObject[sizeY][sizeX];
+        for (int i = 0; i < sizeY; i++) {
+            for (int j = 0; j < sizeX; j++) {
+                this.map[i][j] = new MapObject(i, j, representation[i][j]);
+            }
         }
     }
 
@@ -79,6 +86,17 @@ public class Map {
         return sizeY;
     }
 
+    /**
+     * Get the MapObject from it's coordinates
+     * @param posX It's position on the X axis
+     * @param posY It's position on the Y axis
+     * @return the MapObject found on the given position, null otherwise
+     */
+    public MapObject getObject(int posX, int posY) {
+        return this.map[posY][posX];
+    }
+
+    @Override
     public String toString() {
         String result = "";
         this.map = new MapObject[this.sizeY][this.sizeX];
