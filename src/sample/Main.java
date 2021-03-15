@@ -5,10 +5,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import map.Map;
+
+import java.io.FileInputStream;
+import java.util.Locale;
 
 public class Main extends Application {
 
@@ -19,14 +24,16 @@ public class Main extends Application {
         GridPane pane = new GridPane();
 
         Map map = new Map();
-        char[][] array = map.getRepresentation();
         int sizeX = map.getSizeX();
         int sizeY = map.getSizeY();
 
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
-                Label label = new Label("" + array[y][x], new Rectangle(600 / sizeY, 900 / sizeX));
-                pane.add(label, x, y);
+                Image image = new Image(new FileInputStream("textures/" + map.getObject(x,y).getName().toLowerCase() + ".png"));
+                ImageView iv = new ImageView(image);
+                iv.setFitHeight(25);
+                iv.setFitWidth(25);
+                pane.add(iv, x, y);
             }
         }
 
