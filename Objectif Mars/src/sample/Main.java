@@ -4,16 +4,14 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import map.Map;
 
 import java.io.FileInputStream;
-import java.util.Locale;
+import java.io.FileNotFoundException;
 
 public class Main extends Application {
 
@@ -23,22 +21,31 @@ public class Main extends Application {
         primaryStage.setTitle("Objectif Mars");
         GridPane pane = new GridPane();
 
+        /* Create a Map with the default map representation file */
         Map map = new Map();
         int sizeX = map.getSizeX();
         int sizeY = map.getSizeY();
 
+        /* For each char in the map char representation : */
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
-                Image image = new Image(new FileInputStream(
-                        "C:\\Users\\clem2\\Desktop\\Cours\\JAVA\\projet\\Objectif Mars\\textures\\"
-                                + map.getObject(x,y).getName().toLowerCase() + ".png"));
-                ImageView iv = new ImageView(image);
-                iv.setFitHeight(25);
-                iv.setFitWidth(25);
-                pane.add(iv, x, y);
+                try {
+                    /* Create an image with the given texture for each position of each representations */
+                    Image image = new Image(new FileInputStream("textures/" + map.getObject(x, y).getName().toLowerCase() + ".png"));
+                    ImageView iv = new ImageView(image);
+                    /* Set the size of each parcel to it feet a good looking view. */
+                    iv.setFitHeight(25);
+                    iv.setFitWidth(25);
+                    /* Add each images on the given x:y position in the pane */
+                    pane.add(iv, x, y);
+                } catch (FileNotFoundException e) {
+                    System.err.println("WARNING: You've given a bad texture file/name. A default texture as" +
+                            "been displayed but please change it as soon as possible to avoid further display issues.");
+                }
             }
         }
 
+        /* Add the GridPane into the scene panel */
         Scene scene = new Scene(pane);
         primaryStage.setScene(new Scene(root, 900, 600));
         primaryStage.setScene(scene);
