@@ -96,7 +96,7 @@ public class Map {
         this.map = new MapObject[sizeY][sizeX];
         for (int i = 0; i < sizeY; i++) {
             for (int j = 0; j < sizeX; j++) {
-                this.map[i][j] = new MapObject(i, j, representation[i][j]);
+                this.map[i][j] = new MapObject(j, i, representation[i][j]);
             }
         }
     }
@@ -130,6 +130,21 @@ public class Map {
      */
     public MapObject getObject(int posX, int posY) {
         return this.map[posY][posX];
+    }
+
+    /**
+     * @return the base within the map (a map must have a base to be valid), it can be used to spawn the robot for ex
+     */
+    public MapObject getBase() {
+        for (int i = 0; i < this.sizeY; i++) {
+            for (int j = 0; j < this.sizeX; j++) {
+                if (this.map[i][j].getName() == "Base")
+                    return this.map[i][j];
+            }
+        }
+        System.err.println("ERROR: It appear that there is no base in the map you've entered." +
+                "A base is mandatory to perform certain actions, the process will end now !");
+        return null;
     }
 
     /**

@@ -1,6 +1,8 @@
 package robot;
 
 
+import map.Map;
+
 public class Robot {
     /** A direction that can be one of {NORTH , SOUTH, EAST, WEST} */
     private Direction direction;
@@ -13,6 +15,19 @@ public class Robot {
     /** The battery of the robot, if it hit 0, the robot stops */
     private Battery battery;
 
+    /**
+     * Generate the default robot object.
+     * It'll be creating facing south, with a default laser and a default battery.
+     * The default position of the robot is on the base position of the default map
+     */
+    public Robot() {
+        this.material = Material.getDefault();
+        this.direction = Direction.SOUTH;
+        Map map = new Map();
+        this.posX = map.getBase().getPosX();
+        this.posY = map.getBase().getPosY();
+    }
+
     public Robot(Material[] material, int posX, int posY) {
         this.material = material;
         this.posX = posX;
@@ -21,10 +36,6 @@ public class Robot {
 
     public Direction getDirection() {
         return this.direction;
-    }
-
-    public void setDirection(Direction direction) {
-        this.direction = direction;
     }
 
     public Material[] getEquipement() {
@@ -54,13 +65,13 @@ public class Robot {
     public void move() {
         /* Handle the progress of the robot on the map with it's position */
         if (this.getDirection() == Direction.SOUTH) {
-            posY--;
+            posY++;
         } else if (this.getDirection() == Direction.EAST) {
             posX++;
         } else if (this.getDirection() == Direction.WEST) {
             posX--;
         } else if (this.getDirection() == Direction.NORTH) {
-            posY++;
+            posY--;
         }
     }
 }

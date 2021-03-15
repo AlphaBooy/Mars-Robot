@@ -13,7 +13,7 @@ public class MapObject {
     /**
      * Create an object that can be placed latter on a Map
      * @param posX the position of the object on the X axis (within a line)
-     * @param posY the position of the object on the Y axis (within a collumn)
+     * @param posY the position of the object on the Y axis (within a column)
      * @param name Name of the object that can be displayed in order to help the user
      * @param mapRepresentation The character representation of the object on the map
      */
@@ -27,7 +27,7 @@ public class MapObject {
     /**
      * Create an object without specifying the name. It'll be given automatically based on it's char representation
      * @param posX the position of the object on the X axis (within a line)
-     * @param posY the position of the object on the Y axis (within a collumn)
+     * @param posY the position of the object on the Y axis (within a column)
      * @param mapRepresentation The character representation of the object on the map
      */
     public MapObject(int posX, int posY, char mapRepresentation) {
@@ -61,6 +61,14 @@ public class MapObject {
             case '@': return "Base";
         }
         return "NC";
+    }
+
+    public int getPosX() {
+        return posX;
+    }
+
+    public int getPosY() {
+        return posY;
     }
 
     /**
