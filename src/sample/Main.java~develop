@@ -31,6 +31,7 @@ public class Main extends Application {
         /* For each char in the map char representation : */
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
+<<<<<<< HEAD:Objectif Mars/src/sample/Main.java
                 try {
                     /* Create an image with the given texture for each position of each representations */
                     Image image = new Image(new FileInputStream("textures/" + map.getObject(x, y).getName().toLowerCase() + ".png"));
@@ -44,6 +45,13 @@ public class Main extends Application {
                     System.err.println("WARNING: You've given a bad texture file/name. A default texture as" +
                             "been displayed but please change it as soon as possible to avoid further display issues.");
                 }
+=======
+                Image image = new Image(new FileInputStream("textures/" + map.getObject(x,y).getName().toLowerCase() + ".png"));
+                ImageView iv = new ImageView(image);
+                iv.setFitHeight(25);
+                iv.setFitWidth(25);
+                pane.add(iv, x, y);
+>>>>>>> develop:src/sample/Main.java
             }
         }
 
