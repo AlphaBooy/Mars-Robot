@@ -9,6 +9,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import map.Map;
+import robot.Robot;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -44,6 +45,15 @@ public class Main extends Application {
                 }
             }
         }
+
+        /* Add the robot to it's given position on the map */
+        Robot robot = new Robot();
+
+        Image robotImage = new Image(new FileInputStream(Robot.pathToRobotImage));
+        ImageView robotView = new ImageView(robotImage);
+        robotView.setFitHeight(25);
+        robotView.setFitWidth(25);
+        pane.add(robotView,robot.getPosX(), robot.getPosY());
 
         /* Add the GridPane into the scene panel */
         Scene scene = new Scene(pane);

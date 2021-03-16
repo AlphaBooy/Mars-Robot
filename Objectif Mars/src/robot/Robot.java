@@ -15,6 +15,8 @@ public class Robot {
     /** The battery of the robot, if it hit 0, the robot stops */
     private Battery battery;
 
+    public static final String pathToRobotImage = "textures/robot.png";
+
     /**
      * Generate the default robot object.
      * It'll be creating facing south, with a default laser and a default battery.
@@ -46,16 +48,8 @@ public class Robot {
         return this.posX;
     }
 
-    public void setPosX(int posX) {
-        this.posX = posX;
-    }
-
     public int getPosY() {
         return this.posY;
-    }
-
-    public void setPosY(int posY) {
-        this.posY = posY;
     }
 
     public void rotate(Direction direction){
@@ -73,5 +67,19 @@ public class Robot {
         } else if (this.getDirection() == Direction.NORTH) {
             posY--;
         }
+    }
+
+    public String toString() {
+        String equipmentString = "";
+        for (Material material: getEquipement()) {
+            equipmentString += material.toString() + ",";
+        }
+        return "Position = [x:" + getPosX() + "; y:" + getPosY() + "; dir:" + getDirection() + "]; " +
+                "Equipment = [" + equipmentString + "]";
+    }
+
+    public static void main(String[] args) {
+        Robot robot = new Robot();
+        System.out.println(robot.toString());
     }
 }
