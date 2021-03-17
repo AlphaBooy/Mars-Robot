@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import map.Map;
@@ -35,8 +36,8 @@ public class Main extends Application {
                     Image image = new Image(new FileInputStream("textures/" + map.getObject(x, y).getName().toLowerCase() + ".png"));
                     ImageView iv = new ImageView(image);
                     /* Set the size of each parcel to it feet a good looking view. */
-                    iv.setFitHeight(25);
-                    iv.setFitWidth(25);
+                    iv.setFitHeight(35);
+                    iv.setFitWidth(35);
                     /* Add each images on the given x:y position in the pane */
                     pane.add(iv, x, y);
                 } catch (FileNotFoundException e) {
@@ -51,14 +52,14 @@ public class Main extends Application {
 
         Image robotImage = new Image(new FileInputStream(Robot.PATH_TO_IMAGE));
         ImageView robotView = new ImageView(robotImage);
-        robotView.setFitHeight(25);
-        robotView.setFitWidth(25);
-        pane.add(robotView,robot.getPosX(), robot.getPosY());
+        robotView.setFitHeight(35);
+        robotView.setFitWidth(35);
+        pane.add(robotView, robot.getPosX(), robot.getPosY());
 
         /* Add the GridPane into the scene panel */
         Scene scene = new Scene(pane);
-        primaryStage.setScene(new Scene(root, 900, 600));
         primaryStage.setScene(scene);
+        /* Display the scene on the primary stage  */
         primaryStage.show();
     }
 

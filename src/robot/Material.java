@@ -1,25 +1,23 @@
 package robot;
 
-public class Material {
+public class Material extends Battery {
 
-    private String name;
+    private Object object;
     private int cost;
-    private int initial_value;
 
-    public Material(String nom, int cost, int initial_value) {
-        this.name = name;
+    public Material(Object object, int cost) {
+        this.object = object;
         this.cost = cost;
-        this.initial_value = initial_value;
     }
 
     public static Material[] getDefault() {
         return new Material[] {
-                new Material("Default Battery", 200, 100),
-                new Material("Default Laser", 200, 100)
+                new Material(new Battery(), 200),
+                new Material(new Laser(), 200)
         };
     }
 
     public String toString() {
-        return "[name: " + name + "; cost: " + cost + "; initial value: " + initial_value + "]";
+        return "[Object: " + object.toString() + "; Cost: " + cost + "]";
     }
 }

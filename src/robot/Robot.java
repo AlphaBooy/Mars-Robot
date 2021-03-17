@@ -3,6 +3,8 @@ package robot;
 
 import map.Map;
 
+import java.util.Arrays;
+
 public class Robot {
     /** A direction that can be one of {NORTH , SOUTH, EAST, WEST} */
     private Direction direction;
@@ -103,27 +105,58 @@ public class Robot {
         }
     }
 
-    public String toString() {
-        String equipmentString = "";
-        for (Material material: getEquipement()) {
-            equipmentString += material.toString() + ",";
+    /**
+     * Read an array that contains instructions that will be used by the robot to perform a series of given actions
+     * The robot can : move, rotate, mine, buy or wait.
+     * Handle english or french instructions.
+     * You can give a single instruction (a String) or a multitude (a String[])
+     */
+    public void performActions(String... instructions) {
+        for (String instruction : instructions) {
+            switch (instruction.toLowerCase()) {
+                case "move": case "avancer":
+                    this.move();
+                    break;
+                case "rotate south": case "tourner sud":
+                    this.rotate(Direction.SOUTH);
+                    break;
+                case "rotate east": case "tourner est":
+                    this.rotate(Direction.EAST);
+                    break;
+                case "rotate west": case "tourner ouest":
+                    this.rotate(Direction.WEST);
+                    break;
+                case "rotate north": case "tourner nord":
+                    this.rotate(Direction.NORTH);
+                    break;
+            }
+            System.out.println(this.toString());
         }
-        return "Position = [x:" + getPosX() + "; y:" + getPosY() + "; dir:" + getDirection() + "]; " +
-                "Equipment = [" + equipmentString + "]";
+    }
+
+    @Override
+    public String toString() {
+        return "Robot{" +
+                "direction=" + direction +
+                ", material=" + Arrays.toString(material) +
+                ", posX=" + posX +
+                ", posY=" + posY +
+                ", battery=" + battery +
+                '}';
     }
 
     public static void main(String[] args) {
         Robot robot = new Robot();
-        System.out.println(robot.toString());
-        robot.move();
-        System.out.println(robot.getPosX() + " | " + robot.getPosY());
-        robot.move();
-        System.out.println(robot.getPosX() + " | " + robot.getPosY());
-        robot.move();
-        System.out.println(robot.getPosX() + " | " + robot.getPosY());
-        robot.rotate(Direction.EAST);
-        System.out.println(robot.toString());
-        robot.move();
-        System.out.println(robot.getPosX() + " | " + robot.getPosY());
+        String[] actions = {
+                "avancer",
+                "tourner nord",
+                "avancer",
+                "avancer",
+                "rotate east",
+                "move",
+                "move",
+                "move"
+        };
+        robot.performActions(actions);
     }
 }
