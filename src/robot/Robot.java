@@ -15,7 +15,14 @@ public class Robot {
     /** The battery of the robot, if it hit 0, the robot stops */
     private Battery battery;
 
-    public static final String pathToRobotImage = "textures/robot.png";
+    public static final String PATH_TO_IMAGE = "textures/robot.png";
+
+    private static final int POWER_FOR_MOVING = 10;
+    private static final int POWER_FOR_ROTATING = 15;
+
+    /* Time are in seconds */
+    private static final int TIME_FOR_MOVING = 1;
+    private static final int TIME_FOR_ROTATING = 3;
 
     /**
      * Generate the default robot object.
@@ -24,6 +31,7 @@ public class Robot {
      */
     public Robot() {
         this.material = Material.getDefault();
+        this.battery = new Battery();
         this.direction = Direction.SOUTH;
         Map map = new Map();
         this.posX = map.getBase().getPosX();
@@ -52,10 +60,28 @@ public class Robot {
         return this.posY;
     }
 
+    /**
+     * Rotate the robot (change it's direction) and use POWER_FOR_ROTATING energy of the battery
+     * @param direction The new direction the robot will be facing (NORTH, SOUTH, EAST, WEST)
+     */
     public void rotate(Direction direction){
         this.direction = direction;
+        this.battery.useBattery(POWER_FOR_ROTATING);
+        try {
+            Thread.sleep(TIME_FOR_ROTATING * 1000);
+        } catch (InterruptedException e) {
+            System.err.println("ERROR: You tried to stop (or change) the program while the robot was rotating." +
+                    "The program will stop immediately to avoid any further issues.");
+            System.exit(1);
+        }
     }
 
+    /**
+     * Move the robot by one "terrain unit" (one square on the map)
+     * The robot will use POWER_FOR_MOVING energy of the battery to perform this movement
+     * If the robot reach the end of the map and still try to move forward, it reach the end of the scan
+     * you use to perform tasks on him so it'll disconnect and the game will be over.
+     */
     public void move() {
         /* Handle the progress of the robot on the map with it's position */
         if (this.getDirection() == Direction.SOUTH) {
@@ -66,6 +92,14 @@ public class Robot {
             posX--;
         } else if (this.getDirection() == Direction.NORTH) {
             posY--;
+        }
+        this.battery.useBattery(POWER_FOR_MOVING);
+        try {
+            Thread.sleep(TIME_FOR_MOVING * 1000);
+        } catch (InterruptedException e) {
+            System.err.println("ERROR: You tried to stop (or change) the program while the robot was moving." +
+                    "The program will stop immediately to avoid any further issues.");
+            System.exit(1);
         }
     }
 
@@ -81,5 +115,15 @@ public class Robot {
     public static void main(String[] args) {
         Robot robot = new Robot();
         System.out.println(robot.toString());
+        robot.move();
+        System.out.println(robot.getPosX() + " | " + robot.getPosY());
+        robot.move();
+        System.out.println(robot.getPosX() + " | " + robot.getPosY());
+        robot.move();
+        System.out.println(robot.getPosX() + " | " + robot.getPosY());
+        robot.rotate(Direction.EAST);
+        System.out.println(robot.toString());
+        robot.move();
+        System.out.println(robot.getPosX() + " | " + robot.getPosY());
     }
 }

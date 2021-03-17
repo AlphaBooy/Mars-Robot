@@ -49,7 +49,7 @@ public class Main extends Application {
         /* Add the robot to it's given position on the map */
         Robot robot = new Robot();
 
-        Image robotImage = new Image(new FileInputStream(Robot.pathToRobotImage));
+        Image robotImage = new Image(new FileInputStream(Robot.PATH_TO_IMAGE));
         ImageView robotView = new ImageView(robotImage);
         robotView.setFitHeight(25);
         robotView.setFitWidth(25);
