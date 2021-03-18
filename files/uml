@@ -1,0 +1,81 @@
+This file contains the plain text to use with planUml (https://plantuml.com/fr/) to generate the uml diagram
+
+@startuml
+class Robot {
+-direction :Direction
+-material : Material[]
+-posX: int
+-posY: int
+-battery : Battery
+{static} +PATH_TO_IMAGE: String
+{static} -POWER_FOR_MOVING: int
+{static} -POWER_FOR_ROTATING: int
+{static} -TIME_FOR_MOVING: int
+{static} -TIME_FOR_ROTATING
++Robot()
++getDirection(): Direction
++getEquipement(): Equipement[]
++getPosX(): int
++getPosY(): int
++rotate(direction: Direction): void
++move(): void
++performAction(instructions: String...): void
+}
+class Material {
+-object: Object
+-cost: int
++getDefault(): Material[]
+}
+class battery {
+-name: String
+-capacity: int
+-level: int
++Battery()
++Battery(name: String, capacity: int)
++Battery(name String, capacity: int, level: int)
++chargeBattery(power: int): void
++useBattery(power: int): void
+-emptyBattery(): void
+-explode(): void
+
+}
+enum Direction
+class Laser {
+-name: String
+-power: String
++Laser()
++Laser(name: String, power: int)
+}
+class Map {
+-representation: char[][]
+-sizeX: int
+-sizeY: int
+-map: MapObject[][]
++Map()
++Map(sizeX: int, sizeY: int)
++Map(representation: char[][])
++generateObjects(): void
++getRepresentation(): char[][]
++getRepresentation(filePath: String, sizeX: int, sizeY: int): void
++getSizeX(): int
++getSizeY(): int
++getObject(posX: int, posY: int): MapObject
++getBase(): MapObject
+
+
+
+}
+class MapObject {
+-posX: int
+-posY: int
+-name: String
++mapRepresentation: char
++MapObject(posX: int, posY: int, name: String, mapRepresentation: char)
++MapObject(posX: int, posY: int, mapReprensation: char)
++getName(): String
++getName(representation: char): String
++getPosX(): int
++getPosY(): int
+{static}+ getObject(posX: int, posY: int): MapObject
+}
+@enduml
