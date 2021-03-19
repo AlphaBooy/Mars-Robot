@@ -14,6 +14,10 @@ public class Laser {
         this.power = 100;
     }
 
+    public int getPower() {
+        return power;
+    }
+
     @Override
     public String toString() {
         return "Laser{" +

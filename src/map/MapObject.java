@@ -3,7 +3,6 @@ package map;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
 
 public class MapObject {
     /** Position of the object within a line */
@@ -74,13 +73,35 @@ public class MapObject {
         return "NC";
     }
 
-    public int getValue() {
+    /**
+     * Get the attribute of the map object, one of those :
+     * - Value (the "price" of the object for the end of the game)
+     * - Hardness (the "durability" of the object once the robot started mining)
+     * - weight (the weight of the object one mined and carried by the robot)
+     * @param element The attribute you want to get from the configuration file
+     * @return one of the 3 attributes that describes the map object
+     */
+    public int getAttribute(String element) {
+        int index;
+        switch (element) {
+            case "value": case "valeur":
+                index = 3;
+                break;
+            case "hardness": case "solidite":
+                index = 2;
+                break;
+            case "weight": case "poids":
+                index = 1;
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + element);
+        }
         String [] fileContent = readMapObjectsFile();
         for (int i = 0; i < fileContent.length; i++) {
             String[] fileContentSplit = fileContent[i].split(" ");
             /* Reading each lines of the file */
             if (fileContentSplit[0].charAt(0) == this.mapRepresentation)
-                return fileContentSplit[fileContentSplit.length - 3].charAt(0);
+                return Integer.parseInt(fileContentSplit[fileContentSplit.length - index]);
         }
         return -1;
     }

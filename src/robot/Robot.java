@@ -9,14 +9,12 @@ import java.util.Arrays;
 public class Robot {
     /** A direction that can be one of {NORTH , SOUTH, EAST, WEST} */
     private Direction direction;
-    /** A complete list of the material carried by the robot */
-    private Material[] material;
+    private Laser laser;
+    private Battery battery;
     /** The X position of the robot (supposed to evolve) */
     private int posX;
     /** The Y position of the robot (supposed to evolve) */
     private int posY;
-    /** The battery of the robot, if it hit 0, the robot stops */
-    private Battery battery;
 
     public static final String PATH_TO_IMAGE = "textures/robot.png";
 
@@ -33,8 +31,8 @@ public class Robot {
      * The default position of the robot is on the base position of the default map
      */
     public Robot() {
-        this.material = Material.getDefault();
-        this.battery = new Battery();
+        this.battery = (Battery) Material.getDefault()[0].getObject();
+        this.laser = (Laser) Material.getDefault()[1].getObject();
         this.direction = Direction.NORTH;
         Map map = new Map();
         this.posX = map.getBase().getPosX();
@@ -42,17 +40,14 @@ public class Robot {
     }
 
     public Robot(Material[] material, int posX, int posY) {
-        this.material = material;
+        this.battery = (Battery) material[0].getObject();
+        this.laser = (Laser) material[1].getObject();
         this.posX = posX;
         this.posY = posY;
     }
 
     public Direction getDirection() {
         return this.direction;
-    }
-
-    public Material[] getEquipement() {
-        return this.material;
     }
 
     public int getPosX() {
@@ -145,15 +140,15 @@ public class Robot {
     public void mine(Map map) {
         /* First, we get the object what is mined by the robot when the method is called */
         MapObject mo = map.getObject(this.posX, this.posY);
-        /* Then we return the time needed to mine the MapObject */
-        System.out.println(mo.toString());
+        /* Then we return the time needed to mine the MapObject (hardness * 100) / laser*/
+        int time = (mo.getAttribute("hardness") * 100) / this.laser.getPower();
     }
 
     @Override
     public String toString() {
         return "Robot{" +
                 "direction=" + direction +
-                ", material=" + Arrays.toString(material) +
+                ", material=" + this.battery.toString() + " " + this.laser.toString() +
                 ", posX=" + posX +
                 ", posY=" + posY +
                 ", battery=" + battery +

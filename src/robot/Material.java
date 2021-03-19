@@ -29,6 +29,10 @@ public class Material extends Battery {
         };
     }
 
+    public Object getObject() {
+        return object;
+    }
+
     public String toString() {
         return "[Object: " + object.toString() + "; Cost: " + cost + "]";
     }
