@@ -2,6 +2,7 @@ package robot;
 
 
 import map.Map;
+import map.MapObject;
 
 import java.util.Arrays;
 
@@ -34,7 +35,7 @@ public class Robot {
     public Robot() {
         this.material = Material.getDefault();
         this.battery = new Battery();
-        this.direction = Direction.SOUTH;
+        this.direction = Direction.NORTH;
         Map map = new Map();
         this.posX = map.getBase().getPosX();
         this.posY = map.getBase().getPosY();
@@ -129,9 +130,23 @@ public class Robot {
                 case "rotate north": case "tourner nord":
                     this.rotate(Direction.NORTH);
                     break;
+                case "mine": case "miner":
+                    this.mine(new Map());
+                    break;
             }
             System.out.println(this.toString());
         }
+    }
+
+    /**
+     * Destroy a map object to get loot an ore that can be sold at a given value.
+     * @param map the map where the robot evolve
+     */
+    public void mine(Map map) {
+        /* First, we get the object what is mined by the robot when the method is called */
+        MapObject mo = map.getObject(this.posX, this.posY);
+        /* Then we return the time needed to mine the MapObject */
+        System.out.println(mo.toString());
     }
 
     @Override
@@ -149,13 +164,16 @@ public class Robot {
         Robot robot = new Robot();
         String[] actions = {
                 "avancer",
+                "miner",
                 "tourner nord",
                 "avancer",
                 "avancer",
+                "miner",
                 "rotate east",
                 "move",
                 "move",
-                "move"
+                "move",
+                "miner"
         };
         robot.performActions(actions);
     }
