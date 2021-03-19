@@ -114,6 +114,11 @@ public class MapObject {
         return posY;
     }
 
+    public void destroy() {
+        this.mapRepresentation = ' ';
+        this.name = "void";
+    }
+
     /**
      * Return a printable String that can be displayed to represent a MapObject
      * Ex: Base [x:2, y:5, @]

@@ -27,7 +27,7 @@ public class Robot {
 
     /**
      * Generate the default robot object.
-     * It'll be creating facing south, with a default laser and a default battery.
+     * It'll be creating facing north, with a default laser and a default battery.
      * The default position of the robot is on the base position of the default map
      */
     public Robot() {
@@ -35,6 +35,20 @@ public class Robot {
         this.laser = (Laser) Material.getDefault()[1].getObject();
         this.direction = Direction.NORTH;
         Map map = new Map();
+        this.posX = map.getBase().getPosX();
+        this.posY = map.getBase().getPosY();
+    }
+
+    /**
+     * Generate the default robot object.
+     * It'll be creating facing north, with a default laser and a default battery.
+     * The default position of the robot is on the base position of the map given
+     * @param map The map where the robot will spawn
+     */
+    public Robot(Map map) {
+        this.battery = (Battery) Material.getDefault()[0].getObject();
+        this.laser = (Laser) Material.getDefault()[1].getObject();
+        this.direction = Direction.NORTH;
         this.posX = map.getBase().getPosX();
         this.posY = map.getBase().getPosY();
     }
@@ -142,6 +156,7 @@ public class Robot {
         MapObject mo = map.getObject(this.posX, this.posY);
         /* Then we return the time needed to mine the MapObject (hardness * 100) / laser*/
         int time = (mo.getAttribute("hardness") * 100) / this.laser.getPower();
+
     }
 
     @Override

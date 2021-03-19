@@ -1,6 +1,6 @@
 package robot;
 
-public class Material extends Battery {
+public class Material {
 
     private Object object;
     private int cost;
