@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class Map {
+	/** The path to reach the file containing the map in characters*/
+	private final String materialsPath = "files/maps/zone_1.txt";
     /**
      * The char representation of the map is an array of to dimensions which can be textured
      * by JavaFX or just be displayed in the console, in order to render the Map on a 2D basis.
@@ -54,7 +56,7 @@ public class Map {
     public Map() {
         this.sizeX = 40;
         this.sizeY = 20;
-        getRepresentation("files/maps/zone_1.txt", 41, 21);
+        getRepresentation(materialsPath, 41, 21);
         generateObjects();
     }
 
