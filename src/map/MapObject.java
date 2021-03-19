@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class MapObject {
+	/** The path to reach the file containing the materials names and attributes*/
+	private final String materialsPath = "files/measures/measure_1.txt";
     /** Position of the object within a line */
     private int posX;
     /** Position of the object within a collumn */
@@ -56,7 +58,7 @@ public class MapObject {
     public String getName(char representation) {
         if (representation == '@')
             return "Base"; // Case: The char given is the base (not in the file of materials)
-        String [] fileContent = readMapObjectsFile();
+        String [] fileContent = readMapObjectsFile(materialsPath);
         /* Then, we exploit the array we made to get the name of the object thanks to it's representation */
         for (int i = 0; i < fileContent.length; i++) {
             String[] fileContentSplit = fileContent[i].split(" ");
@@ -96,7 +98,7 @@ public class MapObject {
             default:
                 throw new IllegalStateException("Unexpected value: " + element);
         }
-        String [] fileContent = readMapObjectsFile();
+        String [] fileContent = readMapObjectsFile(materialsPath);
         for (int i = 0; i < fileContent.length; i++) {
             String[] fileContentSplit = fileContent[i].split(" ");
             /* Reading each lines of the file */
@@ -123,10 +125,10 @@ public class MapObject {
         return name + " [x:" + posX + ", y:" + posY + ", " + mapRepresentation + "]";
     }
 
-    private String[] readMapObjectsFile() {
+    protected String[] readMapObjectsFile(String path) {
         String[] fileContent = new String[7]; // Up to 50 possible ores on the map
         /* First, we get, line by line, the content of the file describing all MapObjects */
-        File file = new File("files/measures/measure_1.txt");
+        File file = new File(path);
         try (FileReader fr = new FileReader(file)) {
             int charRead, i = 0;
             while ((charRead = fr.read()) != -1) {
@@ -139,7 +141,7 @@ public class MapObject {
             }
         } catch (IOException e) {
             System.err.println("ERROR: The file describing the map objects is missing or can't be reached." +
-                    "Please, make sure the program can access to \"files/measures/measure_1.txt\"");
+                    "Please, make sure the program can access to \" "+ path + "\"");
         }
         return fileContent;
     }
