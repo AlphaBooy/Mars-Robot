@@ -2,19 +2,18 @@ package sample;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import map.Map;
+import robot.Direction;
 import robot.Robot;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main extends Application {
 
@@ -44,12 +43,39 @@ public class Main extends Application {
             ImageView robotView = new ImageView(robotImage);
             robotView.setFitHeight(35);
             robotView.setFitWidth(35);
+            if (robot.getDirection() == Direction.EAST)
+                robotView.setRotate(90);
+            if (robot.getDirection() == Direction.SOUTH)
+                robotView.setRotate(180);
+            if (robot.getDirection() == Direction.WEST)
+                robotView.setRotate(270);
             pane.add(robotView, robot.getPosX(), robot.getPosY());
         } catch (FileNotFoundException e) {
             System.err.println("WARNING: You've given a bad texture file/name for the robot. The program can't" +
                     "run without a visual representation of the robot so the program will stop.");
             System.exit(1);
         }
+    }
+
+    public static void makeActions(String... actions) {
+        AtomicInteger robotOldX = new AtomicInteger(robot.getPosX());
+        AtomicInteger robotOldY = new AtomicInteger(robot.getPosY());
+        Runnable task = () -> {
+            int i = actions.length;
+            while (i-- > 0) {
+                Platform.runLater(() -> {
+                    displayRobot(robot);
+                    Platform.runLater(() -> {
+                        if (robot.getPosX() != robotOldX.get() || robot.getPosY() != robotOldY.get())
+                            generateTexture(robotOldX.get(), robotOldY.get());
+                    });
+                });
+                robotOldX.set(robot.getPosX());
+                robotOldY.set(robot.getPosY());
+                robot.performActions(actions[i]);
+            }
+        };
+        new Thread(task).start();
     }
 
     @Override
@@ -69,16 +95,9 @@ public class Main extends Application {
         }
         displayRobot(robot);
 
-        Runnable task = () -> {
-            int i = 5;
-            while (i-- > 0) {
-                Platform.runLater(() -> {
-                    displayRobot(robot);
-                });
-                robot.move();
-            }
-        };
-        new Thread(task).start();
+        //String[] actions = {"avancer", "miner", "tourner nord", "avancer", "avancer", "miner", "rotate east", "move", "move", "move", "miner"};
+        String[] actions = {"avancer", "avancer", "tourner est", "avancer", "avancer", "tourner sud", "avancer", "move", "tourner ouest", "move", "avancer"};
+        makeActions(actions);
 
         /* Add the GridPane into the scene panel */
         Scene scene = new Scene(pane);
