@@ -143,7 +143,6 @@ public class Robot {
                     this.mine(new Map());
                     break;
             }
-            System.out.println(this.toString());
         }
     }
 
@@ -155,7 +154,8 @@ public class Robot {
         /* First, we get the object what is mined by the robot when the method is called */
         MapObject mo = map.getObject(this.posX, this.posY);
         /* Then we return the time needed to mine the MapObject (hardness * 100) / laser*/
-        int time = (mo.getAttribute("hardness") * 100) / this.laser.getPower();
+        long time = (mo.getAttribute("hardness") * 100) / this.laser.getPower();
+        mo.destroy();
 
     }
 
@@ -168,23 +168,5 @@ public class Robot {
                 ", posY=" + posY +
                 ", battery=" + battery +
                 '}';
-    }
-
-    public static void main(String[] args) {
-        Robot robot = new Robot();
-        String[] actions = {
-                "avancer",
-                "miner",
-                "tourner nord",
-                "avancer",
-                "avancer",
-                "miner",
-                "rotate east",
-                "move",
-                "move",
-                "move",
-                "miner"
-        };
-        robot.performActions(actions);
     }
 }

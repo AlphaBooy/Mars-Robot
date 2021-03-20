@@ -1,5 +1,7 @@
 This file contains the plain text to use with planUml (https://plantuml.com/fr/) to generate the uml diagram
 
+diagram class
+
 @startuml
 class Robot {
 -direction :Direction
@@ -77,5 +79,24 @@ class MapObject {
 +getPosX(): int
 +getPosY(): int
 {static}+ getObject(posX: int, posY: int): MapObject
+}
+@enduml
+
+diagram cas
+@startuml
+:robot: as robot
+rectangle Projet {
+robot -(pointer une direction)
+robot - (revenir à la base)
+(décharger les objets) as (décharger)
+robot -- (décharger)
+(avancer) as (avancer)
+(miner) as (miner)
+(avancer) <. (miner): include
+robot -(avancer)
+robot - (miner)
+(installer nouveaux équipement) as (acheter)
+robot -- (acheter)
+(acheter) .> (décharger): include
 }
 @enduml
