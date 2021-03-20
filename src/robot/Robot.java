@@ -79,7 +79,6 @@ public class Robot {
      * @param direction The new direction the robot will be facing (NORTH, SOUTH, EAST, WEST)
      */
     public void rotate(Direction direction){
-        this.direction = direction;
         this.battery.useBattery(POWER_FOR_ROTATING);
         try {
             Thread.sleep(TIME_FOR_ROTATING * 1000);
@@ -88,6 +87,7 @@ public class Robot {
                     "The program will stop immediately to avoid any further issues.");
             System.exit(1);
         }
+        this.direction = direction;
     }
 
     /**
@@ -157,6 +157,11 @@ public class Robot {
         MapObject mo = map.getObject(this.posX, this.posY);
         /* Then we return the time needed to mine the MapObject (hardness * 100) / laser*/
         long time = (mo.getAttribute("hardness") * 100) / this.laser.getPower();
+        try {
+            Thread.sleep(time * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         mo.destroy();
         map.setObject(mo.getPosX(), mo.getPosY(), mo);
     }
