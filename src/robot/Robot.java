@@ -32,6 +32,8 @@ public class Robot {
     private static final int TIME_FOR_MOVING = 1;
     private static final int TIME_FOR_ROTATING = 3;
 
+    private static final int MAX_WEIGHT = 300;
+
     /**
      * Generate the default robot object.
      * It'll be creating facing north, with a default laser and a default battery.
@@ -195,12 +197,26 @@ public class Robot {
         try {
             Thread.sleep(time * 1000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            System.err.println("ERROR: You tried to stop (or change) the program while the robot was mining." +
+                    "The program will stop immediately to avoid any further issues.");
         }
-        this.value += mo.getAttribute("value");
-        this.weightCarried += mo.getAttribute("weight");
+        /* Use the battery needed for the robot to mine the map element */
+        this.battery.useBattery(10 * (int) time);
+        /* The laser looses power when used to mine an object */
+        this.laser.loosePower((int) time, mo.getAttribute("hardness"));
+        /* Destroy the MapObject once the time to drill it is over */
         mo.destroy();
         map.setObject(mo.getPosX(), mo.getPosY(), mo);
+        /* Loot the ore contained within the map object (gain value for the result but weight to carry */
+        this.value += mo.getAttribute("value");
+        this.weightCarried += mo.getAttribute("weight");
+        /* Check if the robot can carry that much weight */
+        if (weightCarried > MAX_WEIGHT)
+            gameOver(); // If the robot is overload, end the game
+    }
+
+    public void gameOver() {
+        //TODO write the result on a dedicated file
     }
 
     @Override

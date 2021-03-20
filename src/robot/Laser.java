@@ -4,6 +4,8 @@ public class Laser {
     private String name;
     private int power;
 
+    private static final int MIN_POWER = 1;
+
     public Laser(String name, int power) {
         this.name = name;
         this.power = power;
@@ -16,6 +18,12 @@ public class Laser {
 
     public int getPower() {
         return power;
+    }
+
+    public void loosePower(int time, int hardness) {
+        this.power -= time * hardness;
+        if (this.power < MIN_POWER)
+            this.power = MIN_POWER;
     }
 
     @Override

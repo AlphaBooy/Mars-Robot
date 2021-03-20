@@ -78,6 +78,7 @@ public class Battery {
             this.emptyBattery(); //The battery is empty, the game is over
         // Use one "charging unit" to decrease the battery level
         this.level -= power;
+        System.out.println(this.level);
     }
 
     @Override
