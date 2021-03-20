@@ -133,7 +133,10 @@ public class Main extends Application {
         displayRobot(robot);
 
         /* Run given commands to the robot in a separate thread (different from the map generation thread) */
-        String[] actions = {"avancer", "avancer", "miner", "tourner est", "avancer", "avancer", "miner", "tourner sud", "avancer", "move", "miner", "tourner ouest", "move", "avancer", "miner"};
+        String[] actions = Robot.getActionsFromFile("files/actions/actions_1.txt");
+        for (String action:actions) {
+            System.out.println(action);
+        }
         makeActions(actions);
 
         /* Add the GridPane into the scene panel */

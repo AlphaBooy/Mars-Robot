@@ -1,20 +1,27 @@
 package robot;
 
-
 import map.Map;
 import map.MapObject;
 
-import java.util.Arrays;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class Robot {
     /** A direction that can be one of {NORTH , SOUTH, EAST, WEST} */
     private Direction direction;
     private Laser laser;
     private Battery battery;
+    /** Map on which the robot will appear and evolve */
+    private Map map;
     /** The X position of the robot (supposed to evolve) */
     private int posX;
     /** The Y position of the robot (supposed to evolve) */
     private int posY;
+    /** The total value the robot is carrying, the value also allow the robot to purchase material */
+    private int value;
+    /** The weight carried by the robot. If it's heavier than the max weight the robot can carried, it stop */
+    private int weightCarried;
 
     public static final String PATH_TO_IMAGE = "textures/robot.png";
 
@@ -24,7 +31,6 @@ public class Robot {
     /* Time are in seconds */
     private static final int TIME_FOR_MOVING = 1;
     private static final int TIME_FOR_ROTATING = 3;
-    private Map map;
 
     /**
      * Generate the default robot object.
@@ -38,6 +44,8 @@ public class Robot {
         this.map = new Map();
         this.posX = map.getBase().getPosX();
         this.posY = map.getBase().getPosY();
+        this.value = 0;
+        this.weightCarried = 0;
     }
 
     /**
@@ -53,6 +61,8 @@ public class Robot {
         this.map = map;
         this.posX = map.getBase().getPosX();
         this.posY = map.getBase().getPosY();
+        this.value = 0;
+        this.weightCarried = 0;
     }
 
     public Robot(Material[] material, int posX, int posY) {
@@ -60,6 +70,8 @@ public class Robot {
         this.laser = (Laser) material[1].getObject();
         this.posX = posX;
         this.posY = posY;
+        this.value = 0;
+        this.weightCarried = 0;
     }
 
     public Direction getDirection() {
@@ -72,6 +84,10 @@ public class Robot {
 
     public int getPosY() {
         return this.posY;
+    }
+
+    public int getValue() {
+        return value;
     }
 
     /**
@@ -148,6 +164,21 @@ public class Robot {
         }
     }
 
+    public static String[] getActionsFromFile(String path) {
+        String fileContent = "";
+        File file = new File(path);
+        try (FileReader fr = new FileReader(file)) {
+            int charRead;
+            while ((charRead = fr.read()) != -1) {
+                fileContent += (char) charRead;
+            }
+        } catch (IOException e) {
+            System.err.println("ERROR: The file describing the actions is missing or can't be reached." +
+                    "Please, make sure the program can access to \"" + path + "\"");
+        }
+        return fileContent.split(",");
+    }
+
     /**
      * Destroy a map object to get loot an ore that can be sold at a given value.
      * @param map the map where the robot evolve
@@ -155,6 +186,10 @@ public class Robot {
     public void mine(Map map) {
         /* First, we get the object what is mined by the robot when the method is called */
         MapObject mo = map.getObject(this.posX, this.posY);
+        if (mo.getName() == "Base") {
+            System.err.println("You tried to mine the base of the map but the robot refused !");
+            System.exit(1);
+        }
         /* Then we return the time needed to mine the MapObject (hardness * 100) / laser*/
         long time = (mo.getAttribute("hardness") * 100) / this.laser.getPower();
         try {
@@ -162,6 +197,8 @@ public class Robot {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        this.value += mo.getAttribute("value");
+        this.weightCarried += mo.getAttribute("weight");
         mo.destroy();
         map.setObject(mo.getPosX(), mo.getPosY(), mo);
     }
