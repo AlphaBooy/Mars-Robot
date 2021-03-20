@@ -156,7 +156,6 @@ public class Robot {
         /* Then we return the time needed to mine the MapObject (hardness * 100) / laser*/
         long time = (mo.getAttribute("hardness") * 100) / this.laser.getPower();
         mo.destroy();
-
     }
 
     @Override
