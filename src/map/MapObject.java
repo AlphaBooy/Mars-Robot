@@ -153,14 +153,4 @@ public class MapObject {
         }
         return fileContent;
     }
-
-    /**
-     * Get the MapObject from it's coordinates
-     * @param posX It's position on the X axis
-     * @param posY It's position on the Y axis
-     * @return the MapObject found on the given position, null otherwise
-     */
-    public static MapObject getObject(int posX, int posY) {
-        return null;
-    }
 }

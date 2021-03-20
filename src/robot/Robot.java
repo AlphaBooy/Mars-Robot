@@ -24,6 +24,7 @@ public class Robot {
     /* Time are in seconds */
     private static final int TIME_FOR_MOVING = 1;
     private static final int TIME_FOR_ROTATING = 3;
+    private Map map;
 
     /**
      * Generate the default robot object.
@@ -34,7 +35,7 @@ public class Robot {
         this.battery = (Battery) Material.getDefault()[0].getObject();
         this.laser = (Laser) Material.getDefault()[1].getObject();
         this.direction = Direction.NORTH;
-        Map map = new Map();
+        this.map = new Map();
         this.posX = map.getBase().getPosX();
         this.posY = map.getBase().getPosY();
     }
@@ -49,6 +50,7 @@ public class Robot {
         this.battery = (Battery) Material.getDefault()[0].getObject();
         this.laser = (Laser) Material.getDefault()[1].getObject();
         this.direction = Direction.NORTH;
+        this.map = map;
         this.posX = map.getBase().getPosX();
         this.posY = map.getBase().getPosY();
     }
@@ -140,7 +142,7 @@ public class Robot {
                     this.rotate(Direction.NORTH);
                     break;
                 case "mine": case "miner":
-                    this.mine(new Map());
+                    this.mine(this.map);
                     break;
             }
         }
@@ -156,6 +158,7 @@ public class Robot {
         /* Then we return the time needed to mine the MapObject (hardness * 100) / laser*/
         long time = (mo.getAttribute("hardness") * 100) / this.laser.getPower();
         mo.destroy();
+        map.setObject(mo.getPosX(), mo.getPosY(), mo);
     }
 
     @Override

@@ -20,7 +20,7 @@ public class Main extends Application {
 
     public static GridPane pane = new GridPane();
     public static Map map = new Map();
-    public static Robot robot = new Robot();
+    public static Robot robot = new Robot(map);
 
     /**
      * Display a texture depending of the name of the map object found in the map matrix.
@@ -133,7 +133,7 @@ public class Main extends Application {
         displayRobot(robot);
 
         /* Run given commands to the robot in a separate thread (different from the map generation thread) */
-        String[] actions = {"avancer", "avancer", "tourner est", "avancer", "avancer", "tourner sud", "avancer", "move", "tourner ouest", "move", "avancer"};
+        String[] actions = {"avancer", "avancer", "miner", "tourner est", "avancer", "avancer", "miner", "tourner sud", "avancer", "move", "miner", "tourner ouest", "move", "avancer", "miner"};
         makeActions(actions);
 
         /* Add the GridPane into the scene panel */

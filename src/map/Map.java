@@ -134,6 +134,10 @@ public class Map {
         return this.map[posY][posX];
     }
 
+    public void setObject(int posX, int posY, MapObject mapObject) {
+        this.map[posY][posX] = mapObject;
+    }
+
     /**
      * @return the base within the map (a map must have a base to be valid), it can be used to spawn the robot for ex
      */
