@@ -21,9 +21,9 @@ public class Robot {
     /** The Y position of the robot (supposed to evolve) */
     private int posY;
     /** The total value the robot is carrying, the value also allow the robot to purchase material */
-    private int value;
+    private double value;
     /** The weight carried by the robot. If it's heavier than the max weight the robot can carried, it stop */
-    private int weightCarried;
+    private double weightCarried;
 
     public static final String PATH_TO_IMAGE = "textures/robot.png";
 
@@ -74,8 +74,24 @@ public class Robot {
         return this.posY;
     }
 
-    public int getValue() {
+    public double getValue() {
         return value;
+    }
+
+    public Laser getLaser() {
+        return laser;
+    }
+
+    public Battery getBattery() {
+        return battery;
+    }
+
+    public double getWeightCarried() {
+        return weightCarried;
+    }
+
+    public HashMap<String, Double> getConfig() {
+        return config;
     }
 
     public static HashMap<String, Double> getConfig(String path) {
@@ -219,7 +235,7 @@ public class Robot {
             return; // Don't do anything or the program will fail
         }
         /* Then we return the time needed to mine the MapObject (hardness * 100) / laser*/
-        long time = (mo.getAttribute("hardness") * 100) / this.laser.getPower();
+        long time = (long)((mo.getAttribute("hardness") * 100) / this.laser.getPower());
         try {
             /* Wait the time needed by the robot to mine the MapObject */
             Thread.sleep(time * 1000);
@@ -230,13 +246,13 @@ public class Robot {
         /* Use the battery needed for the robot to mine the map element */
         this.battery.useBattery((double) time);
         /* The laser looses power when used to mine an object */
-        this.laser.loosePower((int) time, mo.getAttribute("hardness"));
-        /* Destroy the MapObject once the time to drill it is over, then, updates the map with the destoyed M-O */
-        mo.destroy();
-        map.setObject(mo.getPosX(), mo.getPosY(), mo);
+        this.laser.loosePower((int) time, this.config.get("emoussage_laser"));
         /* Loot the ore contained within the map object (gain value for the result but also the weight to carry) */
         this.value += mo.getAttribute("value");
         this.weightCarried += mo.getAttribute("weight");
+        /* Destroy the MapObject once the time to drill it is over, then, updates the map with the destoyed M-O */
+        mo.destroy();
+        map.setObject(mo.getPosX(), mo.getPosY(), mo);
         /* Check if the robot can carry that much weight */
         if (weightCarried > this.config.get("charge_maximale"))
             gameOver(); // If the robot is overload, end the game
@@ -244,16 +260,21 @@ public class Robot {
 
     public void gameOver() {
         //TODO write the result on a dedicated file
+        System.out.println("the game is over !");
     }
 
     @Override
     public String toString() {
         return "Robot{" +
-                "direction=" + direction +
-                ", material=" + this.battery.toString() + " " + this.laser.toString() +
+                "config=" + config +
+                ", direction=" + direction +
+                ", laser=" + laser +
+                ", battery=" + battery +
+                ", map=" + map +
                 ", posX=" + posX +
                 ", posY=" + posY +
-                ", battery=" + battery +
+                ", value=" + value +
+                ", weightCarried=" + weightCarried +
                 '}';
     }
 }

@@ -2,11 +2,11 @@ package robot;
 
 public class Laser {
     private String name;
-    private int power;
+    private double power;
 
     private static final int MIN_POWER = 1;
 
-    public Laser(String name, int power) {
+    public Laser(String name, double power) {
         this.name = name;
         this.power = power;
     }
@@ -16,12 +16,12 @@ public class Laser {
         this.power = 100;
     }
 
-    public int getPower() {
+    public double getPower() {
         return power;
     }
 
-    public void loosePower(int time, int hardness) {
-        this.power -= time * hardness;
+    public void loosePower(long time, Double blunt) {
+        this.power -= time * blunt;
         if (this.power < MIN_POWER)
             this.power = MIN_POWER;
     }

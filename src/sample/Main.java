@@ -107,6 +107,9 @@ public class Main extends Application {
                 robotOldY.set(robot.getPosY());
                 /* Run the action asked for the robot */
                 robot.performActions(actions[i]);
+                System.out.println(robot.getBattery().getLevel() + "/" + robot.getBattery().getCapacity());
+                System.out.println(robot.getWeightCarried() + "/" + robot.getConfig().get("charge_maximale"));
+                System.out.println(robot.getLaser().getPower());
                 i++;
             }
         };
@@ -134,9 +137,6 @@ public class Main extends Application {
 
         /* Run given commands to the robot in a separate thread (different from the map generation thread) */
         String[] actions = Robot.getActionsFromFile("files/actions/actions_1.txt");
-        for (String action:actions) {
-            System.out.println(action);
-        }
         makeActions(actions);
 
         /* Add the GridPane into the scene panel */

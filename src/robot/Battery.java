@@ -78,7 +78,14 @@ public class Battery {
             this.emptyBattery(); //The battery is empty, the game is over
         // Use one "charging unit" to decrease the battery level
         this.level -= power;
-        System.out.println(this.level);
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int getCapacity() {
+        return capacity;
     }
 
     @Override
@@ -92,6 +99,7 @@ public class Battery {
 
     private void emptyBattery() {
         this.level = 0;
+        System.out.println("the game is over !");
         //TODO game over
     }
 
@@ -99,5 +107,6 @@ public class Battery {
         // (easter egg)
         // The battery is in overloading !!! Robot will explode now (the game is over)
         //TODO game over
+        System.out.println("the game is over !");
     }
 }
