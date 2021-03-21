@@ -277,4 +277,21 @@ public class Robot {
                 ", weightCarried=" + weightCarried +
                 '}';
     }
+
+    public double getActionDuration(String action) {
+        switch (action.toLowerCase()) {
+            case "move": case "avancer":
+                if (map.getObject(this.posX, this.posY).getName() == "void" || map.getObject(this.posX, this.posY).getName() == "base") {
+                    return this.config.get("temps_deplacement_vide");
+                }
+                MapObject mo = map.getObject(this.posX, this.posY);
+                return (mo.getAttribute("hardness") * 100) / this.laser.getPower();
+            case "rotate south": case "tourner sud":
+            case "rotate east": case "tourner est":
+            case "rotate west": case "tourner ouest":
+            case "rotate north": case "tourner nord":
+                return this.config.get("temps_rotation");
+        }
+        return 0;
+    }
 }

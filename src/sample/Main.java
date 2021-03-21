@@ -26,8 +26,9 @@ public class Main extends Application {
     public static GridPane infos = new GridPane();
     public static Map map = new Map();
     public static Robot robot = new Robot(map, "files/robot/config_1.txt");
+    public static ProgressIndicator pi = new ProgressIndicator(0);
 
-    public static final int BLOCK_SIZE = 30;
+    public static final int BLOCK_SIZE = 35;
 
     /**
      * Display a texture depending of the name of the map object found in the map matrix.
@@ -96,6 +97,7 @@ public class Main extends Application {
         Runnable task = () -> {
             int i = 0;
             while (i < actions.length) {
+                loadingTime(actions[i]);
                 /* After the generation of the map, run : */
                 Platform.runLater(() -> {
                     displayRobot(robot); // Display the robot to it's new position
@@ -122,36 +124,48 @@ public class Main extends Application {
         new Thread(task).start();
     }
 
+    private static void loadingTime(String action) {
+        Runnable task = () -> {
+            double i = 0.0;
+            while (i < robot.getActionDuration(action))
+                pi.setProgress(i / robot.getActionDuration(action));
+        };
+        new Thread(task).start();
+    }
+
     private static void getInfos() {
         Runnable getInfosTask = () -> {
             Platform.runLater(() -> {
+                Label titleListState = new Label("State of the robot :");
+                infos.add(titleListState,0,0);
+                /* A list view that display the current state of the robot (position, battery state, laser...) */
+                ListView<String> listViewState = new ListView<>();
+                listViewState.setDisable(true);
+                listViewState.getItems().add(0,"X = " + robot.getPosX());
+                listViewState.getItems().add(1,"Y = " + robot.getPosY());
+                listViewState.getItems().add(2,"Battery = " + String.format("%.2f", (robot.getBattery().getLevel() / robot.getBattery().getCapacity()) * 100) + " %");
+                listViewState.getItems().add(3,"Weight Carried = " + String.format("%.2f", (robot.getWeightCarried() / robot.getConfig().get("charge_maximale")) * 100) + " %");
+                listViewState.getItems().add(4,"Laser power = " + robot.getLaser().getPower());
+                infos.add(listViewState,0,1);
                 Label titleListConfig = new Label("Configuration of the robot :");
-                infos.add(titleListConfig,0,0);
+                infos.add(titleListConfig,0,2);
                 /* A list view that displays all configuration properties of the robot */
                 ListView<String> listViewConfig = new ListView<>();
                 listViewConfig.setDisable(true);
                 robot.getConfig().forEach((key, value) -> {
                     listViewConfig.getItems().add(key + " = " + value);
                 });
-                infos.add(listViewConfig,0,1);
-                Label titleListState = new Label("State of the robot :");
-                infos.add(titleListState,0,2);
-                /* A list view that display the current state of the robot (position, battery state, laser...) */
-                ListView<String> listViewState = new ListView<>();
-                listViewState.setDisable(true);
-                listViewState.getItems().add("X = " + robot.getPosX());
-                listViewState.getItems().add("Y = " + robot.getPosY());
-                listViewState.getItems().add("Battery = " + String.format("%.2f", (robot.getBattery().getLevel() / robot.getBattery().getCapacity()) * 100) + " %");
-                listViewState.getItems().add("Weight Carried = " + String.format("%.2f", (robot.getWeightCarried() / robot.getConfig().get("charge_maximale")) * 100) + " %");
-                listViewState.getItems().add("Laser power = " + robot.getLaser().getPower());
-                infos.add(listViewState,0,3);
-                /*try {
+                infos.add(listViewConfig,0,3);
+                //infos.add(pi,1,2);
+                try {
                     Image batteryLogo = new Image(new FileInputStream("textures/menu/" + robot.getBattery().getImageName() + ".png"));
                     ImageView batteryLogoView = new ImageView(batteryLogo);
-                    battery.setGraphic(batteryLogoView);
+                    batteryLogoView.setFitHeight(BLOCK_SIZE);
+                    batteryLogoView.setFitWidth(BLOCK_SIZE - 10);
+                    infos.add(batteryLogoView,1,0);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
-                }*/
+                }
             });
         };
         new Thread(getInfosTask).start();
