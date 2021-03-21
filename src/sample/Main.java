@@ -2,14 +2,14 @@ package sample;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import map.Map;
 import robot.Direction;
@@ -125,31 +125,40 @@ public class Main extends Application {
     private static void getInfos() {
         Runnable getInfosTask = () -> {
             Platform.runLater(() -> {
-                Label x = new Label("X = " + robot.getPosX());
-                Label y = new Label("Y = " + robot.getPosY());
-                Label battery = new Label(String.format("%.2f", (robot.getBattery().getLevel() / robot.getBattery().getCapacity()) * 100) + " %");
-                Label weight = new Label("Weight Carried = " + robot.getWeightCarried() + "/" + robot.getConfig().get("charge_maximale"));
-                Label laser = new Label("Laser power = " + robot.getLaser().getPower());
-                System.out.println("textures/menu/" + robot.getBattery().getImageName() + ".png");
-                try {
+                Label titleListConfig = new Label("Configuration of the robot :");
+                infos.add(titleListConfig,0,0);
+                /* A list view that displays all configuration properties of the robot */
+                ListView<String> listViewConfig = new ListView<>();
+                listViewConfig.setDisable(true);
+                robot.getConfig().forEach((key, value) -> {
+                    listViewConfig.getItems().add(key + " = " + value);
+                });
+                infos.add(listViewConfig,0,1);
+                Label titleListState = new Label("State of the robot :");
+                infos.add(titleListState,0,2);
+                /* A list view that display the current state of the robot (position, battery state, laser...) */
+                ListView<String> listViewState = new ListView<>();
+                listViewState.setDisable(true);
+                listViewState.getItems().add("X = " + robot.getPosX());
+                listViewState.getItems().add("Y = " + robot.getPosY());
+                listViewState.getItems().add("Battery = " + String.format("%.2f", (robot.getBattery().getLevel() / robot.getBattery().getCapacity()) * 100) + " %");
+                listViewState.getItems().add("Weight Carried = " + String.format("%.2f", (robot.getWeightCarried() / robot.getConfig().get("charge_maximale")) * 100) + " %");
+                listViewState.getItems().add("Laser power = " + robot.getLaser().getPower());
+                infos.add(listViewState,0,3);
+                /*try {
                     Image batteryLogo = new Image(new FileInputStream("textures/menu/" + robot.getBattery().getImageName() + ".png"));
                     ImageView batteryLogoView = new ImageView(batteryLogo);
                     battery.setGraphic(batteryLogoView);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
-                }
-                infos.add(x, 0, 0);
-                infos.add(y, 0, 1);
-                infos.add(battery, 0, 2);
-                infos.add(weight, 0, 3);
-                infos.add(laser, 0, 4);
+                }*/
             });
         };
         new Thread(getInfosTask).start();
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) {
         primaryStage.setTitle("Objectif Mars");
 
         /* Create a Map with the default map representation file */
@@ -173,12 +182,11 @@ public class Main extends Application {
         makeActions(actions);
 
         BorderPane borderPane = new BorderPane(pane);
-        infos.setAlignment(Pos.TOP_LEFT);
-        borderPane.setRight(infos);
+        borderPane.setLeft(infos);
         /* Add the GridPane into the scene panel */
         Scene scene = new Scene(borderPane);
         primaryStage.setScene(scene);
-        primaryStage.setFullScreen(true);
+        //primaryStage.setFullScreen(true);
         /* Display the scene on the primary stage  */
         primaryStage.show();
     }
