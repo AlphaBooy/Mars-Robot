@@ -2,10 +2,14 @@ package sample;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import map.Map;
 import robot.Direction;
@@ -19,8 +23,11 @@ public class Main extends Application {
 
 
     public static GridPane pane = new GridPane();
+    public static GridPane infos = new GridPane();
     public static Map map = new Map();
     public static Robot robot = new Robot(map, "files/robot/config_1.txt");
+
+    public static final int BLOCK_SIZE = 30;
 
     /**
      * Display a texture depending of the name of the map object found in the map matrix.
@@ -35,8 +42,8 @@ public class Main extends Application {
             Image image = new Image(new FileInputStream("textures/" + map.getObject(x, y).getName().toLowerCase() + ".png"));
             ImageView iv = new ImageView(image);
             /* Set the size of each parcel to it feet a good looking view. */
-            iv.setFitHeight(35);
-            iv.setFitWidth(35);
+            iv.setFitHeight(BLOCK_SIZE);
+            iv.setFitWidth(BLOCK_SIZE);
             pane.add(iv, x, y);
         } catch (FileNotFoundException e) {
             System.err.println("WARNING: You've given a bad texture file/name. A default texture as" +
@@ -54,8 +61,8 @@ public class Main extends Application {
             Image robotImage = new Image(new FileInputStream(Robot.PATH_TO_IMAGE));
             ImageView robotView = new ImageView(robotImage);
             /* Set the size of the robot to match the size of each map objects represented */
-            robotView.setFitHeight(35);
-            robotView.setFitWidth(35);
+            robotView.setFitHeight(BLOCK_SIZE);
+            robotView.setFitWidth(BLOCK_SIZE);
             /* Rotate the robot image depending of the position (by default the image is rotated to NORTH) */
             if (robot.getDirection() == Direction.EAST)
                 robotView.setRotate(90);
@@ -107,14 +114,38 @@ public class Main extends Application {
                 robotOldY.set(robot.getPosY());
                 /* Run the action asked for the robot */
                 robot.performActions(actions[i]);
-                System.out.println(robot.getBattery().getLevel() + "/" + robot.getBattery().getCapacity());
-                System.out.println(robot.getWeightCarried() + "/" + robot.getConfig().get("charge_maximale"));
-                System.out.println(robot.getLaser().getPower());
+                getInfos();
                 i++;
             }
         };
         /* Start the new thread */
         new Thread(task).start();
+    }
+
+    private static void getInfos() {
+        Runnable getInfosTask = () -> {
+            Platform.runLater(() -> {
+                Label x = new Label("X = " + robot.getPosX());
+                Label y = new Label("Y = " + robot.getPosY());
+                Label battery = new Label(String.format("%.2f", (robot.getBattery().getLevel() / robot.getBattery().getCapacity()) * 100) + " %");
+                Label weight = new Label("Weight Carried = " + robot.getWeightCarried() + "/" + robot.getConfig().get("charge_maximale"));
+                Label laser = new Label("Laser power = " + robot.getLaser().getPower());
+                System.out.println("textures/menu/" + robot.getBattery().getImageName() + ".png");
+                try {
+                    Image batteryLogo = new Image(new FileInputStream("textures/menu/" + robot.getBattery().getImageName() + ".png"));
+                    ImageView batteryLogoView = new ImageView(batteryLogo);
+                    battery.setGraphic(batteryLogoView);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                infos.add(x, 0, 0);
+                infos.add(y, 0, 1);
+                infos.add(battery, 0, 2);
+                infos.add(weight, 0, 3);
+                infos.add(laser, 0, 4);
+            });
+        };
+        new Thread(getInfosTask).start();
     }
 
     @Override
@@ -135,13 +166,19 @@ public class Main extends Application {
         /* Display the robot at it's position to initiate the program. Later, the robot will evolve on the map */
         displayRobot(robot);
 
+        getInfos();
+
         /* Run given commands to the robot in a separate thread (different from the map generation thread) */
         String[] actions = Robot.getActionsFromFile("files/actions/actions_1.txt");
         makeActions(actions);
 
+        BorderPane borderPane = new BorderPane(pane);
+        infos.setAlignment(Pos.TOP_LEFT);
+        borderPane.setRight(infos);
         /* Add the GridPane into the scene panel */
-        Scene scene = new Scene(pane);
+        Scene scene = new Scene(borderPane);
         primaryStage.setScene(scene);
+        primaryStage.setFullScreen(true);
         /* Display the scene on the primary stage  */
         primaryStage.show();
     }
