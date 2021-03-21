@@ -20,7 +20,7 @@ public class Main extends Application {
 
     public static GridPane pane = new GridPane();
     public static Map map = new Map();
-    public static Robot robot = new Robot(map);
+    public static Robot robot = new Robot(map, "files/robot/config_1.txt");
 
     /**
      * Display a texture depending of the name of the map object found in the map matrix.

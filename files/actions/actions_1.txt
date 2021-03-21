@@ -1,1 +1,1 @@
-avancer,avancer,miner,avancer,avancer,miner,rotate east,avancer,avancer,miner,tourner nord,avancer,miner,tourner est,avancer,miner,avancer,miner,avancer,avancer,miner
+avancer,avancer,avancer,avancer,rotate east,avancer,avancer,tourner nord,avancer,tourner est,avancer,avancer,avancer,avancer

@@ -73,7 +73,7 @@ public class Battery {
      * Use a custom amount of power that is stored within the battery
      * @param power the amount of power drained to perform a given task
      */
-    public void useBattery(int power) {
+    public void useBattery(Double power) {
         if (this.level - power <= 0)
             this.emptyBattery(); //The battery is empty, the game is over
         // Use one "charging unit" to decrease the battery level
@@ -99,15 +99,5 @@ public class Battery {
         // (easter egg)
         // The battery is in overloading !!! Robot will explode now (the game is over)
         //TODO game over
-    }
-
-    public static void main(String[] args) {
-        Battery bat = new Battery();
-        bat.useBattery(20);
-        try {
-            bat.chargeBattery(10);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

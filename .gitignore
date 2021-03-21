@@ -73,3 +73,15 @@ fabric.properties
 #vscode
 .vscode/
 /bin/
+
+.idea/artifacts/JFX.xml
+
+.idea/misc.xml
+
+.idea/modules.xml
+
+.idea/vcs.xml
+
+Objectif Mars.iml
+
+projet.iml

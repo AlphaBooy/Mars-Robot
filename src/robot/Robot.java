@@ -6,8 +6,10 @@ import map.MapObject;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class Robot {
+    private HashMap<String, Double> config;
     /** A direction that can be one of {NORTH , SOUTH, EAST, WEST} */
     private Direction direction;
     private Laser laser;
@@ -25,21 +27,12 @@ public class Robot {
 
     public static final String PATH_TO_IMAGE = "textures/robot.png";
 
-    private static final int POWER_FOR_MOVING = 10;
-    private static final int POWER_FOR_ROTATING = 15;
-
-    /* Time are in seconds */
-    private static final int TIME_FOR_MOVING = 1;
-    private static final int TIME_FOR_ROTATING = 3;
-
-    private static final int MAX_WEIGHT = 300;
-
     /**
      * Generate the default robot object.
      * It'll be creating facing north, with a default laser and a default battery.
      * The default position of the robot is on the base position of the default map
      */
-    public Robot() {
+    public Robot(String configPath) {
         this.battery = (Battery) Material.getDefault()[0].getObject();
         this.laser = (Laser) Material.getDefault()[1].getObject();
         this.direction = Direction.NORTH;
@@ -48,6 +41,7 @@ public class Robot {
         this.posY = map.getBase().getPosY();
         this.value = 0;
         this.weightCarried = 0;
+        this.config = getConfig(configPath);
     }
 
     /**
@@ -56,7 +50,7 @@ public class Robot {
      * The default position of the robot is on the base position of the map given
      * @param map The map where the robot will spawn
      */
-    public Robot(Map map) {
+    public Robot(Map map, String configPath) {
         this.battery = (Battery) Material.getDefault()[0].getObject();
         this.laser = (Laser) Material.getDefault()[1].getObject();
         this.direction = Direction.NORTH;
@@ -65,15 +59,7 @@ public class Robot {
         this.posY = map.getBase().getPosY();
         this.value = 0;
         this.weightCarried = 0;
-    }
-
-    public Robot(Material[] material, int posX, int posY) {
-        this.battery = (Battery) material[0].getObject();
-        this.laser = (Laser) material[1].getObject();
-        this.posX = posX;
-        this.posY = posY;
-        this.value = 0;
-        this.weightCarried = 0;
+        this.config = getConfig(configPath);
     }
 
     public Direction getDirection() {
@@ -92,19 +78,44 @@ public class Robot {
         return value;
     }
 
+    public static HashMap<String, Double> getConfig(String path) {
+        String lineContent = "";
+        HashMap<String, Double> config = new HashMap<String, Double>();
+        File file = new File(path);
+        try (FileReader fr = new FileReader(file)) {
+            int charRead;
+            while ((charRead = fr.read()) != -1) {
+                if (charRead == '\n') {
+                    config.put(lineContent.split("=")[0],Double.parseDouble(lineContent.split("=")[1]));
+                    lineContent = "";
+                    continue;
+                }
+                lineContent += (char) charRead;
+            }
+        } catch (IOException e) {
+            System.err.println("ERROR: The robot config file is missing or can't be reached." +
+                    "Please, make sure the program can access to \"" + path + "\"");
+        }
+        return  config;
+    }
+
     /**
-     * Rotate the robot (change it's direction) and use POWER_FOR_ROTATING energy of the battery
-     * @param direction The new direction the robot will be facing (NORTH, SOUTH, EAST, WEST)
+     * Rotate the robot (change it's direction). This will change it's battery level and dure a given time.
+     * All data for this will be taken from the config file given to the robot constructor.
+     * @param direction The new direction the robot will be facing (NORTH, SOUTH, EAST, WEST).
      */
     public void rotate(Direction direction){
-        this.battery.useBattery(POWER_FOR_ROTATING);
+        /* Update the battery by the amount of battery taken by a robot rotation. If battery < 0 : the game is over */
+        this.battery.useBattery(this.config.get("cout_rotation"));
         try {
-            Thread.sleep(TIME_FOR_ROTATING * 1000);
+            /* The program waits the necessary time for the robot to rotate */
+            Thread.sleep((long)(this.config.get("temps_rotation") * 1000));
         } catch (InterruptedException e) {
             System.err.println("ERROR: You tried to stop (or change) the program while the robot was rotating." +
                     "The program will stop immediately to avoid any further issues.");
             System.exit(1);
         }
+        /* FINALLY, change the direction of the robot */
         this.direction = direction;
     }
 
@@ -115,7 +126,7 @@ public class Robot {
      * you use to perform tasks on him so it'll disconnect and the game will be over.
      */
     public void move() {
-        /* Handle the progress of the robot on the map with it's position */
+        /* Handle the progress of the robot on the map with it's position (the movement is function of the direction) */
         if (this.getDirection() == Direction.SOUTH) {
             posY++;
         } else if (this.getDirection() == Direction.EAST) {
@@ -125,13 +136,21 @@ public class Robot {
         } else if (this.getDirection() == Direction.NORTH) {
             posY--;
         }
-        this.battery.useBattery(POWER_FOR_MOVING);
-        try {
-            Thread.sleep(TIME_FOR_MOVING * 1000);
-        } catch (InterruptedException e) {
-            System.err.println("ERROR: You tried to stop (or change) the program while the robot was moving." +
-                    "The program will stop immediately to avoid any further issues.");
-            System.exit(1);
+        /* CASE --> the robot evolve on a mined MapObject : the movement time is the minimum one */
+        if (map.getObject(this.posX, this.posY).getName() == "void") {
+            /* Use the necessary energy from the battery to move the robot forward. The robot'll stop if battery < 0 */
+            this.battery.useBattery(this.config.get("cout_deplacement"));
+            try {
+                /* Wait enought time for the robot to move on the map. Durations are converted in milliseconds (*1000) */
+                Thread.sleep((long) (this.config.get("temps_deplacement_vide") * 1000));
+            } catch (InterruptedException e) {
+                System.err.println("ERROR: You tried to stop (or change) the program while the robot was moving." +
+                        "The program will stop immediately to avoid any further issues.");
+                System.exit(1);
+            }
+        } else {
+            /* CASE --> The Map Object hasn't been mined yet so the delay is handled by the mining process */
+            this.mine(this.map);
         }
     }
 
@@ -166,6 +185,13 @@ public class Robot {
         }
     }
 
+    /**
+     * Used to perform actions stored in a file.
+     * The method will just get actions separated by a ',' in an "actions" folders file and return them as an array of
+     * Strings. On a higher level, it can be used to inject actions to the "PerformActions" method.
+     * @param path The path where actions are stored.
+     * @return an array representing the list of actions the robot can perform on the map
+     */
     public static String[] getActionsFromFile(String path) {
         String fileContent = "";
         File file = new File(path);
@@ -185,33 +211,34 @@ public class Robot {
      * Destroy a map object to get loot an ore that can be sold at a given value.
      * @param map the map where the robot evolve
      */
-    public void mine(Map map) {
+    private void mine(Map map) {
         /* First, we get the object what is mined by the robot when the method is called */
         MapObject mo = map.getObject(this.posX, this.posY);
+        /* Case -> The robot is on the base (unbreakable) don't mine it and continue the robot's path */
         if (mo.getName() == "Base") {
-            System.err.println("You tried to mine the base of the map but the robot refused !");
-            System.exit(1);
+            return; // Don't do anything or the program will fail
         }
         /* Then we return the time needed to mine the MapObject (hardness * 100) / laser*/
         long time = (mo.getAttribute("hardness") * 100) / this.laser.getPower();
         try {
+            /* Wait the time needed by the robot to mine the MapObject */
             Thread.sleep(time * 1000);
         } catch (InterruptedException e) {
             System.err.println("ERROR: You tried to stop (or change) the program while the robot was mining." +
                     "The program will stop immediately to avoid any further issues.");
         }
         /* Use the battery needed for the robot to mine the map element */
-        this.battery.useBattery(10 * (int) time);
+        this.battery.useBattery((double) time);
         /* The laser looses power when used to mine an object */
         this.laser.loosePower((int) time, mo.getAttribute("hardness"));
-        /* Destroy the MapObject once the time to drill it is over */
+        /* Destroy the MapObject once the time to drill it is over, then, updates the map with the destoyed M-O */
         mo.destroy();
         map.setObject(mo.getPosX(), mo.getPosY(), mo);
-        /* Loot the ore contained within the map object (gain value for the result but weight to carry */
+        /* Loot the ore contained within the map object (gain value for the result but also the weight to carry) */
         this.value += mo.getAttribute("value");
         this.weightCarried += mo.getAttribute("weight");
         /* Check if the robot can carry that much weight */
-        if (weightCarried > MAX_WEIGHT)
+        if (weightCarried > this.config.get("charge_maximale"))
             gameOver(); // If the robot is overload, end the game
     }
 
