@@ -18,28 +18,26 @@ public class Robot {
     /** The current line of the robot's command log */
     private static int c;
     /** The current line of the robot's data log */
-    private int d;
+    private static int d;
     
-    private String name;
+    private static String name;
    
     private static char Log[];
 
     
     
-    public Robot(int energy, int posX, int posY, int d) {
+    public Robot(String chosenName, int posX, int posY) {
 		super();
-		this.name = "Curiosity";
+		this.name = chosenName;
 		this.energy = 10;
-		this.posX = 0;
-		this.posY = 0;
+		this.posX = posX;
+		this.posY = posY;
 		this.d = 0;
 		this.c = 0;
+		this.Log = new char[100];
+		initBot();
 	}
-
-
-
-	public static final String PATH_TO_IMAGE = "textures/robot.png";
-    
+ 
     public int getPosX() {
         return this.posX;
     }
@@ -48,62 +46,41 @@ public class Robot {
         return this.posY;
     }
     
-    private char getData(int pos){
-    	return Log[pos];
-    	
-    }
-    private char getCommand(int pos) {
+   
+    public char getCommandData(int pos) {
     	return Log[pos];
     }
-    public static void readBot() {
-    	File directory=new File("U:\\git\\projet-java-objectif-mars\\files\\combat\\bots");
-    	String[] pathnames;
-    	pathnames = directory.list();
-    	    int fileCount=directory.list().length;
-    	for(String pathname:pathnames)
-    	{
-    		
+    public char[] getLog() {
+    	return Log;
+    }
+    public String getName() {
+    	return name;
+    }
+    
+    public static void initBot() {
+    	File robotFile= new File("U:\\git\\projet-java-objectif-mars\\files\\combat\\bots\\" +name+ ".txt");
     		
     		try {
-    			BufferedReader r = new BufferedReader(new FileReader(pathname));
-    			int ch;
-    			while((ch=r.read())!=-1){
+    			BufferedReader r = new BufferedReader(new FileReader(robotFile));
+    			char ch;
+    			while((ch=(char)r.read())!=' ');
+    			
+    			while((ch=((char)r.read()))!= '\n'){
     				 if (Character.isUpperCase(ch)){
-    		                Character.toLowerCase(ch);
+    		                ch =Character.toLowerCase(ch);
     		         }
-    					switch(ch) {
-    			    	  case 'p':
-    			    		  Log[c] = 'p';
-    			    	    break;
-    			    	  case 'g':
-    			    		  Log[c] = 'g';
-    			    	    break;
-    			    	  case 'd':
-    			    		  Log[c] = 'd';
-    			      	  break;
-    			    	  case 'm':
-    			    		  Log[c] = 'm';
-    			      	   break;
-    			    	  case 'k':
-    			    		  Log[c] = 'k';
-    			      	    break;
-    			    	  case 'y':
-    			    		  Log[c] = 'y';
-    			      	    break;
-    			    	  case 'i':
-    			    		  Log[c] = 'i';
-    			      	    break;
-    			    	  default:
-    					}  
+    			    		  Log[c] = ch;
+    			    		  c++;
+    			    		  d++;
     			}
-    		
+    			
+    			
     		} catch(Exception e) {
    	         // if any error occurs
    			e.printStackTrace();}
  	
-    	}
-    	
     }
+    	
     
     
 
@@ -111,7 +88,7 @@ public class Robot {
     	char x,y;
     	switch(command) {
     	  case 'p':
-    		  PublicStack.stack(getData(d));
+    		  PublicStack.stack(getCommandData(d));
     	    break;
     	  case 'g':
     	    y = PublicStack.getStack(PublicStack.getP());
@@ -133,7 +110,7 @@ public class Robot {
         	   d =0;
       	    break;
     	  case 'y':
-    		  switch(getData(d))
+    		  switch(getCommandData(d))
     		  {
     		  case ' ' :
     		  break;

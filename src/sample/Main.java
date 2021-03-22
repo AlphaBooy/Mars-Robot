@@ -15,55 +15,15 @@ import robot.Robot;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-public class Main extends Application {
-
-    @Override
-    public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Objectif Mars");
-        GridPane pane = new GridPane();
-
-        /* Create a Map with the default map representation file */
-        Map map = new Map();
-        int sizeX = map.getSizeX();
-        int sizeY = map.getSizeY();
-
-        /* For each char in the map char representation : */
-        for (int x = 0; x < sizeX; x++) {
-            for (int y = 0; y < sizeY; y++) {
-                try {
-                    /* Create an image with the given texture for each position of each representations */
-                    Image image = new Image(new FileInputStream("textures/" + map.getObject(x, y).getName().toLowerCase() + ".png"));
-                    ImageView iv = new ImageView(image);
-                    /* Set the size of each parcel to it feet a good looking view. */
-                    iv.setFitHeight(35);
-                    iv.setFitWidth(35);
-                    /* Add each images on the given x:y position in the pane */
-                    pane.add(iv, x, y);
-                } catch (FileNotFoundException e) {
-                    System.err.println("WARNING: You've given a bad texture file/name. A default texture as" +
-                            "been displayed but please change it as soon as possible to avoid further display issues.");
-                }
-            }
-        }
-
-        /* Add the robot to it's given position on the map */
-        Robot robot = new Robot();
-
-        Image robotImage = new Image(new FileInputStream(Robot.PATH_TO_IMAGE));
-        ImageView robotView = new ImageView(robotImage);
-        robotView.setFitHeight(35);
-        robotView.setFitWidth(35);
-        pane.add(robotView, robot.getPosX(), robot.getPosY());
-
-        /* Add the GridPane into the scene panel */
-        Scene scene = new Scene(pane);
-        primaryStage.setScene(scene);
-        /* Display the scene on the primary stage  */
-        primaryStage.show();
-    }
-
+public class Main{
     public static void main(String[] args) {
-        launch(args);
+        combat.robot.Robot Discovery = new combat.robot.Robot("Discovery",10,5);
+        
+        System.out.printf("Nom : %s Position : %d %d \n Log :",Discovery.getName(),Discovery.getPosX(),Discovery.getPosY());
+        for(int i = 0;i < 25;i++) {
+        System.out.printf("%c",Discovery.getCommandData(i));
+        }
     }
+    
 }
+
