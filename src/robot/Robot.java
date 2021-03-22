@@ -153,7 +153,7 @@ public class Robot {
             posY--;
         }
         /* CASE --> the robot evolve on a mined MapObject : the movement time is the minimum one */
-        if (map.getObject(this.posX, this.posY).getName() == "void") {
+        if (map.getObject(this.posX, this.posY).getName() == "void" || map.getObject(this.posX, this.posY).getName() == "base") {
             /* Use the necessary energy from the battery to move the robot forward. The robot'll stop if battery < 0 */
             this.battery.useBattery(this.config.get("cout_deplacement"));
             try {
@@ -230,10 +230,6 @@ public class Robot {
     private void mine(Map map) {
         /* First, we get the object what is mined by the robot when the method is called */
         MapObject mo = map.getObject(this.posX, this.posY);
-        /* Case -> The robot is on the base (unbreakable) don't mine it and continue the robot's path */
-        if (mo.getName() == "Base") {
-            return; // Don't do anything or the program will fail
-        }
         /* Then we return the time needed to mine the MapObject (hardness * 100) / laser*/
         long time = (long)((mo.getAttribute("hardness") * 100) / this.laser.getPower());
         try {

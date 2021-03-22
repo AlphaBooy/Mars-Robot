@@ -28,7 +28,7 @@ public class Main extends Application {
     public static Robot robot = new Robot(map, "files/robot/config_1.txt");
     public static ProgressIndicator pi = new ProgressIndicator(0);
 
-    public static final int BLOCK_SIZE = 35;
+    public static final int BLOCK_SIZE = 32;
 
     /**
      * Display a texture depending of the name of the map object found in the map matrix.
@@ -127,8 +127,16 @@ public class Main extends Application {
     private static void loadingTime(String action) {
         Runnable task = () -> {
             double i = 0.0;
-            while (i < robot.getActionDuration(action))
-                pi.setProgress(i / robot.getActionDuration(action));
+            pi.setProgress(0);
+            try {
+                while (i++ < robot.getActionDuration(action)) {
+                    pi.setProgress(i / robot.getActionDuration(action));
+                        Thread.sleep(1000);
+                }
+            } catch (InterruptedException e) {
+                System.err.println("ERROR: You can't stop the program while the robot is performing tasks. Execution failed");
+                System.exit(1);
+            }
         };
         new Thread(task).start();
     }
@@ -156,7 +164,7 @@ public class Main extends Application {
                     listViewConfig.getItems().add(key + " = " + value);
                 });
                 infos.add(listViewConfig,0,3);
-                //infos.add(pi,1,2);
+                infos.add(pi,1,2);
                 try {
                     Image batteryLogo = new Image(new FileInputStream("textures/menu/" + robot.getBattery().getImageName() + ".png"));
                     ImageView batteryLogoView = new ImageView(batteryLogo);
@@ -164,7 +172,8 @@ public class Main extends Application {
                     batteryLogoView.setFitWidth(BLOCK_SIZE - 10);
                     infos.add(batteryLogoView,1,0);
                 } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+                    System.err.println("ERROR: Unable to find some textures necessary for the good program behavior.");
+                    System.exit(1);
                 }
             });
         };
