@@ -8,11 +8,16 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import map.Map;
 import robot.Direction;
+import robot.Material;
 import robot.Robot;
 
 import java.io.FileInputStream;
@@ -24,11 +29,12 @@ public class Main extends Application {
 
     public static GridPane pane = new GridPane();
     public static GridPane infos = new GridPane();
+    public static GridPane material = new GridPane();
     public static Map map = new Map();
     public static Robot robot = new Robot(map, "files/robot/config_1.txt");
     public static ProgressIndicator pi = new ProgressIndicator(0);
 
-    public static final int BLOCK_SIZE = 32;
+    public static final int BLOCK_SIZE = 25;
 
     /**
      * Display a texture depending of the name of the map object found in the map matrix.
@@ -154,6 +160,7 @@ public class Main extends Application {
                 listViewState.getItems().add(2,"Battery = " + String.format("%.2f", (robot.getBattery().getLevel() / robot.getBattery().getCapacity()) * 100) + " %");
                 listViewState.getItems().add(3,"Weight Carried = " + String.format("%.2f", (robot.getWeightCarried() / robot.getConfig().get("charge_maximale")) * 100) + " %");
                 listViewState.getItems().add(4,"Laser power = " + robot.getLaser().getPower());
+                listViewState.refresh();
                 infos.add(listViewState,0,1);
                 Label titleListConfig = new Label("Configuration of the robot :");
                 infos.add(titleListConfig,0,2);
@@ -164,7 +171,6 @@ public class Main extends Application {
                     listViewConfig.getItems().add(key + " = " + value);
                 });
                 infos.add(listViewConfig,0,3);
-                infos.add(pi,1,2);
                 try {
                     Image batteryLogo = new Image(new FileInputStream("textures/menu/" + robot.getBattery().getImageName() + ".png"));
                     ImageView batteryLogoView = new ImageView(batteryLogo);
@@ -175,9 +181,22 @@ public class Main extends Application {
                     System.err.println("ERROR: Unable to find some textures necessary for the good program behavior.");
                     System.exit(1);
                 }
+                Platform.runLater(() -> {
+                    listViewConfig.refresh();
+                    listViewState.refresh();
+                });
             });
         };
         new Thread(getInfosTask).start();
+    }
+
+    public static void displayMaterial() {
+        /* A list view that displays all configuration properties of the robot */
+        ListView<String> listViewMaterial = new ListView<>();
+        Material.getAllMaterial("files/material/material_list_1.txt").forEach((materialElement) -> {
+            listViewMaterial.getItems().add(materialElement.getName());
+        });
+        material.add(listViewMaterial,0,0);
     }
 
     @Override
@@ -199,6 +218,7 @@ public class Main extends Application {
         displayRobot(robot);
 
         getInfos();
+        displayMaterial();
 
         /* Run given commands to the robot in a separate thread (different from the map generation thread) */
         String[] actions = Robot.getActionsFromFile("files/actions/actions_1.txt");
@@ -206,6 +226,8 @@ public class Main extends Application {
 
         BorderPane borderPane = new BorderPane(pane);
         borderPane.setLeft(infos);
+        infos.add(pi,1,2);
+        borderPane.setRight(material);
         /* Add the GridPane into the scene panel */
         Scene scene = new Scene(borderPane);
         primaryStage.setScene(scene);
