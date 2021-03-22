@@ -211,6 +211,7 @@ public class Main extends Application {
         }
         /* Display the robot at it's position to initiate the program. Later, the robot will evolve on the map */
         displayRobot(robot);
+        Robot.startGame();
 
         getInfos();
         displayMaterial();

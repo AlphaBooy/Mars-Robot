@@ -5,6 +5,7 @@ import map.MapObject;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -152,7 +153,7 @@ public class Robot {
         } else if (this.getDirection() == Direction.NORTH) {
             posY--;
         }
-        /* CASE --> the robot evolve on a mined MapObject : the movement time is the minimum one */
+        /* CASE --> the robot evolve on a mined MapObject or on the base : the movement time is the minimum one */
         if (map.getObject(this.posX, this.posY).getName() == "void" || map.getObject(this.posX, this.posY).getName() == "base") {
             /* Use the necessary energy from the battery to move the robot forward. The robot'll stop if battery < 0 */
             this.battery.useBattery(this.config.get("cout_deplacement"));
@@ -181,18 +182,23 @@ public class Robot {
             switch (instruction.toLowerCase()) {
                 case "move": case "avancer":
                     this.move();
+                    writeInResult("AVANCER,");
                     break;
                 case "rotate south": case "tourner sud":
                     this.rotate(Direction.SOUTH);
+                    writeInResult("TOURNER SUD,");
                     break;
                 case "rotate east": case "tourner est":
                     this.rotate(Direction.EAST);
+                    writeInResult("TOURNER EST,");
                     break;
                 case "rotate west": case "tourner ouest":
                     this.rotate(Direction.WEST);
+                    writeInResult("TOURNER OUEST,");
                     break;
                 case "rotate north": case "tourner nord":
                     this.rotate(Direction.NORTH);
+                    writeInResult("TOURNER NORD,");
                     break;
                 case "mine": case "miner":
                     this.mine(this.map);
@@ -255,8 +261,21 @@ public class Robot {
     }
 
     public void gameOver() {
-        //TODO write the result on a dedicated file
+        writeInResult(Double.toString(this.value));
         System.out.println("the game is over !");
+        setCurrentNumber(); // Upgrade the run version number
+    }
+
+    private void writeInResult(String resultToWrite) {
+        String path = "files/results/run_" + getCurrentRunNumber();
+        File resultFile = new File(path);
+        try {
+            FileWriter myWriter = new FileWriter(resultFile);
+            myWriter.write(resultToWrite);
+            myWriter.close();
+        } catch (IOException e) {
+            System.err.println("ERROR: Can't create the result file ! Make sure the program has access to the result repository.");
+        }
     }
 
     @Override
@@ -289,5 +308,41 @@ public class Robot {
                 return this.config.get("temps_rotation");
         }
         return 0;
+    }
+
+    public static void startGame() {
+        String path = "files/results/run_" + getCurrentRunNumber();
+        File resultFile = new File(path);
+        try {
+            FileWriter myWriter = new FileWriter(resultFile);
+            myWriter.write(" ");
+            myWriter.close();
+        } catch (IOException e) {
+            System.err.println("ERROR: Can't create the result file ! Make sure the program has access to the result repository.");
+        }
+    }
+
+    private static int getCurrentRunNumber() {
+        File file = new File("files/results/current_number.txt");
+        try (FileReader fr = new FileReader(file)) {
+            return fr.read();
+        } catch (IOException e) {
+            System.err.println("ERROR: Missing file, critical error !");
+            System.exit(1);
+        }
+        return 1; // DEFAULT
+    }
+
+    private static void setCurrentNumber() {
+
+        String path = "files/results/current_number.txt";
+        File resultFile = new File(path);
+        try {
+            FileWriter myWriter = new FileWriter(resultFile);
+            myWriter.write(getCurrentRunNumber() + 1);
+            myWriter.close();
+        } catch (IOException e) {
+            System.err.println("ERROR: Can't create the result file ! Make sure the program has access to the result repository.");
+        }
     }
 }

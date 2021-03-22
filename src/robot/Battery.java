@@ -39,7 +39,7 @@ public class Battery {
      */
     public Battery(String name, double capacity, double level) {
         if (level > capacity) // To much power inside the battery
-            this.explode();   // The robot can't handle it so it'll explode
+            level = capacity;
         this.name = name;
         this.capacity = capacity;
         this.level = level;
@@ -117,14 +117,6 @@ public class Battery {
 
     private void emptyBattery() {
         this.level = 0;
-        System.out.println("the game is over !");
-        //TODO game over
-    }
-
-    private void explode() {
-        // (easter egg)
-        // The battery is in overloading !!! Robot will explode now (the game is over)
-        //TODO game over
         System.out.println("the game is over !");
     }
 }
