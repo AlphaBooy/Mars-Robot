@@ -2,18 +2,13 @@ package sample;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import map.Map;
 import robot.Direction;
@@ -32,7 +27,7 @@ public class Main extends Application {
     public static GridPane material = new GridPane();
     public static Map map = new Map();
     public static Robot robot = new Robot(map, "files/robot/config_1.txt");
-    public static ProgressIndicator pi = new ProgressIndicator(0);
+    public static ProgressBar pi = new ProgressBar(0);
 
     public static final int BLOCK_SIZE = 25;
 
@@ -226,8 +221,10 @@ public class Main extends Application {
 
         BorderPane borderPane = new BorderPane(pane);
         borderPane.setLeft(infos);
-        infos.add(pi,1,2);
         borderPane.setRight(material);
+        pi.setMaxWidth(800);
+        borderPane.setBottom(pi);
+        BorderPane.setAlignment(pi, Pos.CENTER);
         /* Add the GridPane into the scene panel */
         Scene scene = new Scene(borderPane);
         primaryStage.setScene(scene);
