@@ -42,11 +42,11 @@ public class Robot {
 	}
  
     public int getPosX() {
-        return this.posX;
+        return posX;
     }
 
     public int getPosY() {
-        return this.posY;
+        return posY;
     }
     
    
@@ -61,14 +61,16 @@ public class Robot {
     }
     
     public static void initBot() {
-    	File robotFile= new File("U:\\git\\projet-java-objectif-mars\\files\\combat\\bots\\" +name+ ".txt");
+    	File robotFile= new File("files\\combat\\bots\\" +name+ ".txt");
     		
     		try {
     			BufferedReader r = new BufferedReader(new FileReader(robotFile));
     			char ch;
-    			while((ch=(char)r.read())!=' ');
+    			int temp;
+    			while((temp=r.read())!=' ');
     			
-    			while((ch=((char)r.read()))!= '\n'){
+    			while((temp=r.read()) != -1){
+    				ch = (char)temp;
     				 if (Character.isUpperCase(ch)){
     		                ch =Character.toLowerCase(ch);
     		         }
@@ -81,7 +83,8 @@ public class Robot {
     		} catch(Exception e) {
    	         // if any error occurs
    			e.printStackTrace();}
- 	
+    		c = 0;
+    		d++;
     }
     	
     
@@ -89,6 +92,7 @@ public class Robot {
 
     private void executeCommand(char command){
     	char x,y;
+    	CombatMap map = CombatMap.getInstance();
     	switch(command) {
     	  case 'p':
     		  PublicStack.stack(getCommandData(d));
@@ -128,10 +132,18 @@ public class Robot {
     			  moveRobot(Direction.SOUTH);
         		  break;
     		  case '$' :
+    			  energy--;
         		  break;
     		  case '%' :
         		  break;
     		  case '&' :
+    			  for(int i = -1;i <2;i++)
+    			  {
+    				  for(int j = -1 ; i<2;i++)
+    				  {
+    					  if(map.getChar(posX,posY) =='#') map.setChar(posX,posY,' ');
+    				  }
+    			  }
     			 
         		  break;
     		  }
@@ -145,6 +157,7 @@ public class Robot {
     	    destroyRobot();
     	    break;
     	}
+    	c++;
 
     	
     }
@@ -191,6 +204,7 @@ public class Robot {
 	}
 	
 	public void destroyRobot() {
+		
 		//TODO
 	}
     

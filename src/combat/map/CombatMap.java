@@ -131,7 +131,7 @@ public class CombatMap {
     /*
      * Set the char c at the given coordinates in the matrix
      */
-    private void setChar(int x, int y, char c) {
+    public void setChar(int x, int y, char c) {
     	map[x][y] = c;
     }
     
