@@ -65,6 +65,7 @@ public class CombatMap {
             int numLigne = 0, numColonne = 0;
             this.map = new char[sizeY][sizeX+1]; //The size is a number of characters and in a text file the cursor can be placed between every character horizontally, hence the +1 
             /* While we read a char that is considered as the end of the file by FileReader : */
+            this.robots = new ArrayList<Robot>();
             while ((charRead = fr.read()) != -1) {
                 /* If the line is over : */
                 if (charRead == '\n') {
