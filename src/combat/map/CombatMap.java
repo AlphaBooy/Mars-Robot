@@ -3,12 +3,16 @@ package combat.map;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
+import combat.robot.Robot;
 import map.MapObject;
 import robot.Direction;
 
 
 public class CombatMap {
+	// The path leading to the file containing the map in characters
 	private final String path = "files/maps/zone_combat_1.txt";
     // The X size of the Map (can be called the length of the map) */
     private final int sizeX = 30;
@@ -16,17 +20,22 @@ public class CombatMap {
     private final int sizeY = 19;
     // the energy given by the batteries (represented by '%') on the map
     private final int energy_battery_value = 4;
+    // A collection containing the names (and numbers) of robots to instantiate
+	private ArrayList<String> robotsNames = new ArrayList<String>(Arrays.asList("Curiosity","Discovery","Normandy"));
     /**
      * The representation of the map as characters
      */
     private char [][] map;
+    
+    // The array of robots currently presents on the map
+    private ArrayList<Robot> robots;
     
 
 
 	/**
      * Load the given file and stores the characters in a matrix
      * the matrix is of the given size X Y
-     * sizeX and sizeY are the number of character inside the file
+     * sizeX and sizeY are the number of columns and lines of characters inside the file
      */
     private static volatile CombatMap instance = null;
     
@@ -63,6 +72,15 @@ public class CombatMap {
                     numColonne = 0; // We start over from the first element of the new line
                 /* If the char we get is valid (ie != \n & != -1) : */
                 } else {
+                    if(charRead == '@') { //If the char is a robot we add it to the robots list
+                    	if(robotsNames.size() > 0) { // It is also necessary to have robots names left
+	                    	Robot rb = new Robot(robotsNames.get(0),numLigne,numColonne);
+	                    	robots.add(rb);
+	                    	robotsNames.remove(0);
+                    	}else { // Else there are no more robots to add so we replace it by an empty space
+                    		charRead = ' ';
+                    	}
+                    }
                     // We can save it onto our array of representation
                     this.map[numLigne][numColonne] = (char) charRead;
                     numColonne++; // After that, we increase our position within the array
@@ -86,7 +104,7 @@ public class CombatMap {
 	}
 	/**
 	 * 
-	 * @return the heigth of the matrix
+	 * @return the height of the matrix
 	 */
 	public int getSizeY() {
 		return sizeY;
@@ -127,7 +145,7 @@ public class CombatMap {
      * @param y2 pos y of the destination
      * @throws if the pos1 is not a robot
      */
-    public boolean moveContent(int x1,int y1, int x2, int y2, combat.robot.Robot rb) throws IsNotARobotException {
+    public boolean moveContent(int x1,int y1, int x2, int y2) throws IsNotARobotException {
     	boolean success = true;
     	//check if all the given coordinates fit inside the matrix, if not leave the function
     	if(!isPosValid(x1,y1) || !isPosValid(x2,y2))
@@ -135,8 +153,7 @@ public class CombatMap {
     	if(success) {
 	    	char pos1 = getChar(x1,y1);
 	    	char pos2 = getChar(x2,y2);
-	    	if(pos1 != '@')
-	    		throw new IsNotARobotException("No robot found at the coordinates " + x1 + ";" + x2);
+	    	Robot rb = getRobot(x1,y1);
 	    	if(pos2 == '%') {
 	    		rb.addEnergy(energy_battery_value);
 	    	}else if(pos2 == '#' || pos2 == '@') { // If the second pos is a wall or another robot the movement is cancelled
@@ -151,6 +168,26 @@ public class CombatMap {
     	return success;
     }
     /**
+     * Damage all robots on the 9 positions near and including the first one
+     * @param x
+     * @param y
+     */
+    public void damageRobots(int x, int y) {
+    	for(int i = x - 1; i <= x + 1; i++) {
+    		for(int j = y - 1; j <= y + 1; y++) {
+    			if(isPosValid(i,j) && getChar(i,j) == '@') {
+    				try {
+    					Robot rb = getRobot(i,j);
+    					rb.addEnergy(-1);
+    				}catch(IsNotARobotException e) {
+    					System.err.println("ERROR: No robot found here : " + e.getMessage());
+    				}
+    			}
+    		}
+    	}
+    }
+    
+    /**
      * Check if the given set of coordinate fit inside the map matrix
      * @param x
      * @param y
@@ -163,5 +200,22 @@ public class CombatMap {
     	if(y < 0 || y >= sizeY)
     		success = false;
     	return success;
+    }
+    /**
+     * Get the robot for the givn coordinates
+     * @param x
+     * @param y
+     * @return The corresponding robot
+     * @throws IsNotARobotException if there are no robots with the given coordinates
+     */
+    private Robot getRobot(int x, int y) throws IsNotARobotException {
+    	Robot rb = null;
+    	for(int i = 0; i < robots.size(); i++) {
+    		if(robots.get(i).getPosX() == x && robots.get(i).getPosY() == y)
+    			rb = robots.get(i);
+    	}
+    	if(rb == null)
+    		throw new IsNotARobotException("No robot found at the coordinates " + x + ";" + y);
+    	return rb;
     }
 }

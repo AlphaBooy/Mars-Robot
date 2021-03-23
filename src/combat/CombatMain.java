@@ -7,6 +7,7 @@ public class CombatMain {
 		
 		CombatMap map = CombatMap.getInstance();
 		map.DiplayMap();
+		
 	}
 
 }

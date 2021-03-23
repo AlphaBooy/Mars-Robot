@@ -31,7 +31,6 @@ public class Robot {
     
     
     public Robot(String chosenName, int posX, int posY) {
-		super();
 		this.name = chosenName;
 		this.energy = 10;
 		this.posX = posX;
@@ -143,7 +142,8 @@ public class Robot {
       	    
       	    break;
     	  default:
-    	    
+    	    destroyRobot();
+    	    break;
     	}
 
     	
@@ -157,19 +157,19 @@ public class Robot {
     	try {
 		switch(dir) {
 		case NORTH :
-			if(map.moveContent(posX, posY, posX, posY-1, this))
+			if(map.moveContent(posX, posY, posX, posY-1))
 				posY -=1;
 			break;
 		case WEST :
-			if(map.moveContent(posX, posY, posX-1, posY, this))
+			if(map.moveContent(posX, posY, posX-1, posY))
 				posX -=1;
 			break;
 		case SOUTH :
-			if(map.moveContent(posX, posY, posX, posY+1, this))
+			if(map.moveContent(posX, posY, posX, posY+1))
 				posY +=1;
 			break;
 		case EAST :
-			if(map.moveContent(posX, posY, posX+1, posY, this))
+			if(map.moveContent(posX, posY, posX+1, posY))
 				posX +=1;
 			break;
 		default :
