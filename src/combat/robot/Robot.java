@@ -24,12 +24,13 @@ public class Robot {
     /** The current line of the robot's data log */
     private static int d;
     
+    private static int log[];
+    
     private static String name;
    
-    private static char Log[];
 
     
-    
+
     public Robot(String chosenName, int posX, int posY) {
 		this.name = chosenName;
 		this.energy = 10;
@@ -37,7 +38,7 @@ public class Robot {
 		this.posY = posY;
 		this.d = 0;
 		this.c = 0;
-		this.Log = new char[100];
+		this.log = new int[100];
 		initBot();
 	}
  
@@ -50,12 +51,14 @@ public class Robot {
     }
     
    
-    public char getCommandData(int pos) {
-    	return Log[pos];
+    public int getCommand() {
+    	return c;
     }
-    public char[] getLog() {
-    	return Log;
+    public int getData()
+    {
+    	return d;
     }
+
     public String getName() {
     	return name;
     }
@@ -65,18 +68,16 @@ public class Robot {
     		
     		try {
     			BufferedReader r = new BufferedReader(new FileReader(robotFile));
-    			char ch;
-    			int temp;
-    			while((temp=r.read())!=' ');
+    			int ch;
+    			int i =0;
+    			while((ch=r.read())!=' ');
     			
-    			while((temp=r.read()) != -1){
-    				ch = (char)temp;
+    			while((ch=r.read()) != -1){
     				 if (Character.isUpperCase(ch)){
     		                ch =Character.toLowerCase(ch);
     		         }
-    			    		  Log[c] = ch;
-    			    		  c++;
-    			    		  d++;
+    			    		  log[i] = ch;
+    			    		  i++;
     			}
     			
     			
@@ -91,17 +92,16 @@ public class Robot {
     
 
     private void executeCommand(char command){
-    	char x,y;
+    	int x,y;
     	CombatMap map = CombatMap.getInstance();
     	switch(command) {
     	  case 'p':
-    		  PublicStack.stack(getCommandData(d));
+    		  PublicStack.stack(d);
     	    break;
     	  case 'g':
     	    y = PublicStack.getStack(PublicStack.getP());
+    	    
     	    x = PublicStack.getStack(PublicStack.getP()-1);
-    	    x = (char)(x%2);
-    	    x &= (y%2);
     	    
     	    PublicStack.stack(x);
     	    break;
@@ -110,14 +110,14 @@ public class Robot {
       	    d = PublicStack.unStack();
       	  break;
     	  case 'm':
-      	   Log[d] = PublicStack.unStack();
+      	   d = PublicStack.unStack();
       	   break;
     	  case 'k':
     		  c = d;
         	   d =0;
       	    break;
     	  case 'y':
-    		  switch(getCommandData(d))
+    		  switch(d)
     		  {
     		  case ' ' :
     			  moveRobot(Direction.EAST);
@@ -132,7 +132,14 @@ public class Robot {
     			  moveRobot(Direction.SOUTH);
         		  break;
     		  case '$' :
-    			  energy--;
+    			  for(int i = -1;i <2;i++)
+    			  {
+    				  for(int j = -1 ; i<2;i++)
+    				  {
+    					  map.damageRobots(posX+i,posY+j);
+    				  }
+    			  }
+    			 
         		  break;
     		  case '%' :
         		  break;
@@ -141,7 +148,7 @@ public class Robot {
     			  {
     				  for(int j = -1 ; i<2;i++)
     				  {
-    					  if(map.getChar(posX,posY) =='#') map.setChar(posX,posY,' ');
+    					  if(map.getChar(posX+i,posY+j) =='#') map.setChar(posX+i,posY+j,' ');
     				  }
     			  }
     			 

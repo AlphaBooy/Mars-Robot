@@ -1,7 +1,7 @@
 package combat.robot;
 
 public class PublicStack {
-	private static char stack[];
+	private static int stack[];
 	private static int p;
 	
 	
@@ -9,18 +9,18 @@ public class PublicStack {
 		return p;
 	}
 	
-	public static char getStack(int pos) {
+	public static int getStack(int pos) {
 		return stack[pos];
 	}
-	public static void setStack(char value) {
+	public static void setStack(int value) {
 		stack[p] = value;
 	}
-	public static void stack(char value) {
+	public static void stack(int value) {
 		stack[p]=value;
 		p++;	
 	}
-	public static char unStack() {
-		char unstackedValue;
+	public static int unStack() {
+		int unstackedValue;
 		unstackedValue = stack[p];
 		p--;
 		return unstackedValue;
