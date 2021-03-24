@@ -118,6 +118,8 @@ Robot *-- Laser
 Robot *-- Map
 Map o-- MapObject
 @enduml
+
+
 diagram cas
 @startuml
 :robot: as robot
@@ -136,3 +138,25 @@ robot -- (acheter)
 (acheter) .> (décharger): include
 }
 @enduml
+
+Diagram etat-transition (bouger robot)
+
+@startuml
+[*] --> bougerRobot 
+state bougerRobot {
+[*] --> analyseCaseDevant
+analyseCaseDevant --> Avancer : case vide
+analyseCaseDevant --> miner : case pleine
+miner --> Avancer
+state miner {
+[*] --> mine 
+mine : after(durreté *100 / efficacité)
+mine --> [*]
+}
+miner -> [*] : [charge robot > charge max]
+miner --> [*] : [batterie <= 0]
+Avancer : after (tempsDéplacement)
+Avancer --> [*]
+}
+@enduml
+
