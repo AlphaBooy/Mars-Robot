@@ -1,75 +1,76 @@
-// package tests;
+package tests;
 
-// import static org.junit.Assert.assertEquals;
 
-// import java.lang.annotation.ElementType;
-// import java.lang.annotation.Retention;
-// import java.lang.annotation.RetentionPolicy;
-// import java.lang.annotation.Target;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// import javax.swing.plaf.synth.SynthSeparatorUI;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-// import org.junit.jupiter.api.BeforeEach;
-// import org.junit.jupiter.api.Disabled;
-// import org.junit.jupiter.api.DisplayName;
-// import org.junit.jupiter.api.Tag;
-// import org.junit.jupiter.api.Test;
+import javax.swing.plaf.synth.SynthSeparatorUI;
 
-// import robot.Battery;
-// import robot.Direction;
-// import robot.Laser;
-// import robot.Robot;
-// import map.Map; 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
-// public class TestRobot {
-//     private Robot robot;
-//     private static final String CHEMINCONFIG = "/Users/sylvain/Documents/projet-java-objectif-mars/files/robot/config_1.txt";
-//     // private static final String CHEMINCONFIG = "files/robot/config_1.txt";
+import robot.Battery;
+import robot.Direction;
+import robot.Laser;
+import robot.Robot;
+import map.Map; 
 
-//     @BeforeEach
-//     public void beforeEach(){
-//         this.robot = new Robot(CHEMINCONFIG);
-//     }
+public class TestRobot {
+    private Robot robot;
+    private static final String CHEMINCONFIG = "/Users/sylvain/Documents/projet-java-objectif-mars/files/robot/config_1.txt";
+    // private static final String CHEMINCONFIG = "files/robot/config_1.txt";
 
-//     @Test
-//     @DisplayName("a new robot should have the default value")
-//     public void createRobotTest(){
+    @BeforeEach
+    public void beforeEach(){
+        this.robot = new Robot(CHEMINCONFIG);
+    }
+
+    @Test
+    @DisplayName("a new robot should have the default value")
+    public void createRobotTest(){
     
-//         assertEquals("The battery should be the default battery", new Battery().toString(), robot.getBattery().toString());
-//         assertEquals("The laser should be the default laser", new Laser().toString(), robot.getLaser().toString());
-//         assertEquals("The direction should be the NOTH direction", Direction.NORTH, robot.getDirection());
-//         assertEquals("The posX should be the posX of the base", new Map().getBase().getPosX(), robot.getPosX());
-//         assertEquals("The posY should be the posY od the base", new Map().getBase().getPosY(), robot.getPosY());
-//         assertEquals("The value should be 0", 0, robot.getValue(), 0.001); //the last arguments is the precision
-//         assertEquals("The getWeightCarried should be 0", 0, robot.getWeightCarried(), 0.001);
-//     }
+        assertEquals(new Battery().toString(), robot.getBattery().toString(), "The battery should be the default battery");
+        assertEquals(new Laser().toString(), robot.getLaser().toString(), "The laser should be the default laser");
+        assertEquals(Direction.NORTH, robot.getDirection(), "The direction should be the NOTH direction");
+        assertEquals(new Map().getBase().getPosX(), robot.getPosX(), "The posX should be the posX of the base");
+        assertEquals(new Map().getBase().getPosY(), robot.getPosY(), "The posY should be the posY od the base");
+        assertEquals(0, robot.getValue(), 0.001, "The value should be 0"); //the last arguments is the precision
+        assertEquals(0, robot.getWeightCarried(), 0.001, "The getWeightCarried should be 0");
+    }
 
-//     @Test
-//     @DisplayName("change direction of robot")
-//     public void changeDirectionRobotTest(){
-//         assertEquals(Direction.NORTH, robot.getDirection());
-//         robot.rotate(Direction.EAST);
-//         assertEquals("The direction should be the east", Direction.EAST, robot.getDirection());
-//         robot.rotate(Direction.SOUTH);
-//         assertEquals("The direction should be the north", Direction.SOUTH, robot.getDirection());
-//         robot.rotate(Direction.WEST);
-//         assertEquals("The direction should be the west", Direction.WEST, robot.getDirection());
-//     }
+    @Test
+    @DisplayName("change direction of robot")
+    public void changeDirectionRobotTest(){
+        assertEquals(Direction.NORTH, robot.getDirection());
+        robot.rotate(Direction.EAST);
+        assertEquals(Direction.EAST, robot.getDirection(), "The direction should be the east");
+        robot.rotate(Direction.SOUTH);
+        assertEquals(Direction.SOUTH, robot.getDirection(), "The direction should be the north");
+        robot.rotate(Direction.WEST);
+        assertEquals(Direction.WEST, robot.getDirection(), "The direction should be the west");
+    }
 
     
-//     @Test
-//     @DisplayName("Move the robot")
-//     public void moveRobotTest(){
-//         int x = robot.getPosX();
-//         int y = robot.getPosY();
+    @Test
+    @DisplayName("Move the robot")
+    public void moveRobotTest(){
+        int x = robot.getPosX();
+        int y = robot.getPosY();
 
-//         robot.move();
-//         assertEquals("The posY should be decremented by 1", --y, robot.getPosY());
-//         assertEquals("The posX shouln'd be incremented", x, robot.getPosX());
-//         //Pour le tests de l'usure de la batterie, 
-//         //Il faut regarder la case sur laquel il va s'avancer
-//         //si elle est vide, la battery est usée de cout-deplacement
-//         //si elle est pas vide elle est usée de la dureté du cailloux * 100
-//         // assertEquals("The battery should be decremented by 0.0178", new Battery().getLevel() - 0.0178, robot.getBattery().getLevel(), 0.00001);
-//     }
-// }
+        robot.move();
+        assertEquals(--y, robot.getPosY(), "The posY should be decremented by 1");
+        assertEquals(x, robot.getPosX(), "The posX shouln'd be incremented");
+        //Pour le tests de l'usure de la batterie, 
+        //Il faut regarder la case sur laquel il va s'avancer
+        //si elle est vide, la battery est usée de cout-deplacement
+        //si elle est pas vide elle est usée de la dureté du cailloux * 100
+        // assertEquals("The battery should be decremented by 0.0178", new Battery().getLevel() - 0.0178, robot.getBattery().getLevel(), 0.00001);
+    }
+}
