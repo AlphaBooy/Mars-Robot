@@ -1,53 +1,84 @@
 This file contains the plain text to use with planUml (https://plantuml.com/fr/) to generate the uml diagram
 
-diagram class
+diagram needed : 
+- cas d'utilisation 
+- class
+- séquence 
+- état-transition (2)
 
+
+diagram class
 @startuml
 class Robot {
+-config : HashMap<String, Double>
 -direction :Direction
--material : Material[]
+-laser : Laser
+-battery : Battery
+-map : Map
 -posX: int
 -posY: int
--battery : Battery
+-value : double
+-weightCarried: double
 {static} +PATH_TO_IMAGE: String
-{static} -POWER_FOR_MOVING: int
-{static} -POWER_FOR_ROTATING: int
-{static} -TIME_FOR_MOVING: int
-{static} -TIME_FOR_ROTATING
-+Robot()
++Robot(configPath: String)
++Robot(map: Map, configPath: String)
 +getDirection(): Direction
-+getEquipement(): Equipement[]
 +getPosX(): int
 +getPosY(): int
++getValue(): double
++getLaser() : Laser
++getBattery(): Battery
++getWeightCarried(): double
++{static} getConfig: HashMap<String, double>
 +rotate(direction: Direction): void
 +move(): void
 +performAction(instructions: String...): void
++{static} getActionFromFile(path: String): String[]
++mine(): void
++gameover(): void
++writeInResult(resultToWrite: String): void
++getActionDuration(action: String)
++{static} startGame(): void
+-{static} getCurrentRunNumber(): int
+-{static} setCurrentRunNumber(): void
 }
+
 class Material {
 -object: Object
 -cost: int
++Material(object: Object, cost: int)
 +getDefault(): Material[]
++getAllMaterial(path: String): ArrayList<Material>
++isLaser(name String): boolean
++isBattery(name: String): boolean
++getName(): String
++getObject(): Object
 }
-class battery {
+
+class Battery {
 -name: String
--capacity: int
--level: int
+-capacity: double
+-level: double
 +Battery()
-+Battery(name: String, capacity: int)
-+Battery(name String, capacity: int, level: int)
-+chargeBattery(power: int): void
-+useBattery(power: int): void
++Battery(name: String, capacity: double)
++Battery(name String, capacity: double, level: double)
++chargeBattery(power: double): void
++useBattery(power: double): void
++getImageName(): String
 -emptyBattery(): void
--explode(): void
 
 }
 enum Direction
+
 class Laser {
 -name: String
--power: String
+-power: double
 +Laser()
-+Laser(name: String, power: int)
++Laser(name: String, power: double)
++getPower(): double
++loosePower(time: long, blunt: double)
 }
+
 class Map {
 -representation: char[][]
 -sizeX: int
@@ -62,11 +93,10 @@ class Map {
 +getSizeX(): int
 +getSizeY(): int
 +getObject(posX: int, posY: int): MapObject
++setObject(posX: int, posY: int, mapObject: MapObject)
 +getBase(): MapObject
-
-
-
 }
+
 class MapObject {
 -posX: int
 -posY: int
@@ -78,10 +108,16 @@ class MapObject {
 +getName(representation: char): String
 +getPosX(): int
 +getPosY(): int
++getAttribute(element: String): int
++destroy(): void
 {static}+ getObject(posX: int, posY: int): MapObject
 }
-@enduml
 
+Robot *-- Battery
+Robot *-- Laser
+Robot *-- Map
+Map o-- MapObject
+@enduml
 diagram cas
 @startuml
 :robot: as robot
