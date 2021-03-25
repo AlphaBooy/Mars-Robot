@@ -3,10 +3,7 @@ package robot;
 import map.Map;
 import map.MapObject;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 
 public class Robot {
@@ -210,6 +207,7 @@ public class Robot {
                     break;
             }
         }
+        //gameOver(); // When all instructions over :
     }
 
     /**
@@ -265,7 +263,7 @@ public class Robot {
     }
 
     public void gameOver() {
-        writeInResult(Double.toString(this.value));
+        writeInResult("SCORE " + Double.toString(this.value));
         System.out.println("the game is over !");
         setCurrentNumber(); // Upgrade the run version number
     }
@@ -274,7 +272,7 @@ public class Robot {
         String path = "files/results/run_" + getCurrentRunNumber();
         File resultFile = new File(path);
         try {
-            FileWriter myWriter = new FileWriter(resultFile);
+            BufferedWriter myWriter = new BufferedWriter(new FileWriter(resultFile, true));
             myWriter.write(resultToWrite);
             myWriter.close();
         } catch (IOException e) {
