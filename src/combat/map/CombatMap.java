@@ -12,11 +12,11 @@ import combat.robot.Robot;
 
 public class CombatMap {
 	// The path leading to the file containing the map in characters
-	private final String path = "files/maps/zone_combat_1.txt";
+	private final String path = "files/combat/arena/zone_combat_2.txt";
     // The X size of the Map (can be called the length of the map) */
-    private final int sizeX = 30;
+    private final int sizeX = 10;
     //The Y size of the Map (can be called the height of the map) */
-    private final int sizeY = 19;
+    private final int sizeY = 10;
     // the energy given by the batteries (represented by '%') on the map
     private final int energy_battery_value = 4;
     // A collection containing the names (and numbers) of robots to instantiate
@@ -92,9 +92,9 @@ public class CombatMap {
             System.err.println("ERROR: An error occured during the creation of the map, please check that" +
         " the given file match the given size of the matrix. "+ e.getMessage());
         }catch (IOException e) {
-            System.err.println("ERROR: An error occurred while opening the file containing the representation" +
+            System.err.println("ERROR: An error occurred while opening the file containing the representation " +
                     "of the map you've given. Please consider verify the path file and the validity and correct access" +
-                    "right of the file." + e.getMessage());
+                    " of the file." + e.getMessage());
         }
         for (Robot rb : robots) {
 			
@@ -158,7 +158,6 @@ public class CombatMap {
     	if(!isPosValid(x1,y1) || !isPosValid(x2,y2))
     		success = false;
     	if(success) {
-	    	char pos1 = getChar(x1,y1);
 	    	char pos2 = getChar(x2,y2);
 	    	Robot rb = getRobot(x1,y1);
 	    	if(pos2 == '%') {
@@ -193,7 +192,75 @@ public class CombatMap {
     		}
     	}
     }
-    
+    /**
+     * Give one energy to the robot on this position for each robot on all the 9 near position,
+     * but also give 2 energy to every other robot on the 8 near positions
+     * @param x posX of the robot to recharge
+     * @param y posY of the robot to recharge
+     */
+    public void rechargeRobots(int x, int y) {
+    	int energyToGive = 0;
+    	Robot robotToRecharge = null;
+		try {
+			robotToRecharge = getRobot(x,y);
+		}catch(IsNotARobotException e) {
+			System.err.println("ERROR: The position for energy restituion isn't a robot : " + e.getMessage());
+		}
+    	for(int i = x - 1; i <= x + 1; i++) {
+    		for(int j = y - 1; j <= y + 1; y++) {
+    			if(isPosValid(i,j) && getChar(i,j) == '@') {//For all robots on the 9 positions
+    				energyToGive += 1;
+    				if(!(x == i && y == j)) {//If the position isn't the robot calling this method
+        				try {
+        					Robot rb = getRobot(i,j);
+        					rb.addEnergy(2);
+        				}catch(IsNotARobotException e) {
+        					System.err.println("ERROR: No robot found for energy restitution : " + e.getMessage());
+        				}
+    				}
+    			}
+    		}
+    	}
+    	robotToRecharge.addEnergy(energyToGive);
+    }
+    /**
+     * Destroy all walls on the adjacent positions and withdraw one energy
+     * from the robot on the center for each wall found
+     * @param x posX of the robot
+     * @param y posY of the robot
+     */
+    public void destroyWalls(int x, int y) {
+    	int nbWalls = 0;
+    	Robot robotToRecharge = null;
+		try {
+			robotToRecharge = getRobot(x,y);
+		}catch(IsNotARobotException e) {
+			System.err.println("ERROR: The position for wall breaking isn't a robot : " + e.getMessage());
+		}
+    	for(int i = x - 1; i <= x + 1; i++) {
+    		for(int j = y - 1; j <= y + 1; y++) {
+    			if(isPosValid(i,j) && getChar(i,j) == '#') {//For all robots on the 9 positions
+    				setChar(i,j,' ');
+    				nbWalls += 1;
+    			}
+    		}
+    	}
+    	robotToRecharge.addEnergy(-nbWalls);
+    }
+    /**
+     * Destroy the given robot and remove it from the map, it is replaced by a battery
+     */
+	public void destroyRobot(int x, int y) {
+    	Robot robotToDestroy = null;
+		try {
+			robotToDestroy = getRobot(x,y);
+			robots.remove(robotToDestroy);
+			setChar(x, y, '%');
+		}catch(IsNotARobotException e) {
+			System.err.println("ERROR: The given robot to destroy isn't a robot : " + e.getMessage());
+		}
+	}
+	
     /**
      * Check if the given set of coordinate fit inside the map matrix
      * @param x
@@ -209,7 +276,7 @@ public class CombatMap {
     	return success;
     }
     /**
-     * Get the robot for the givn coordinates
+     * Get the robot for the given coordinates
      * @param x
      * @param y
      * @return The corresponding robot
@@ -225,15 +292,6 @@ public class CombatMap {
     		throw new IsNotARobotException("No robot found at the coordinates " + x + ";" + y);
     	return rb;
     }
-    public void destroyRobot(int x,int y) {
-    
-    	try {
-			this.robots.remove(getRobot(x,y));
-		} catch (IsNotARobotException e) {
-			e.printStackTrace();
-		}
-    	
-	}
     public char turn() {
     	Scanner sc = new Scanner(System.in);   
     	char c = sc.next().charAt(0);   
@@ -261,5 +319,4 @@ public class CombatMap {
     }
     
 
- 
 }

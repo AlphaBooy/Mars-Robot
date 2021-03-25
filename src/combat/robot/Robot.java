@@ -89,7 +89,7 @@ public class Robot {
     			    		  
     			}
     			
-    			
+    			r.close();
     		} catch(Exception e) {
    	         // if any error occurs
    			e.printStackTrace();}
@@ -150,21 +150,19 @@ public class Robot {
     			  moveRobot(Direction.SOUTH);
         		  break;
     		  case '$' :
+
     			 
     					  map.damageRobots(posX,posY);
  
+
+				  map.damageRobots(posX, posY);
+
         		  break;
     		  case '%' :
+    			  map.rechargeRobots(posX, posY);
         		  break;
     		  case '&' :
-    			  for(int i = -1;i <2;i++)
-    			  {
-    				  for(int j = -1 ; i<2;i++)
-    				  {
-    					  if(map.getChar(posX+i,posY+j) =='#') map.setChar(posX+i,posY+j,' ');
-    				  }
-    			  }
-    			 
+    			  map.destroyWalls(posX, posY);
         		  break;
     		  }
     		  System.out.printf("Action : y");
@@ -176,6 +174,9 @@ public class Robot {
       	  System.out.printf("Action : i");
       	    break;
     	  default:
+
+    	    map.destroyRobot(posX, posY);
+
     	    break;
     	}
     	c++;
@@ -222,13 +223,19 @@ public class Robot {
 		this.energy += value;
 		if(this.energy > 10)
 			this.energy = 10;
+
 		else if(this.energy <= 0);
-	}
+
+		else if(this.energy <= 0)
+			map.destroyRobot(posX, posY);
+}
+
 	
 	
 
  
  
+
 }
 
 
