@@ -80,7 +80,7 @@ public class Robot {
     			    		  i++;
     			}
     			
-    			
+    			r.close();
     		} catch(Exception e) {
    	         // if any error occurs
    			e.printStackTrace();}
@@ -132,26 +132,13 @@ public class Robot {
     			  moveRobot(Direction.SOUTH);
         		  break;
     		  case '$' :
-    			  for(int i = -1;i <2;i++)
-    			  {
-    				  for(int j = -1 ; i<2;i++)
-    				  {
-    					  map.damageRobots(posX+i,posY+j);
-    				  }
-    			  }
-    			 
+				  map.damageRobots(posX, posY);
         		  break;
     		  case '%' :
+    			  map.rechargeRobots(posX, posY);
         		  break;
     		  case '&' :
-    			  for(int i = -1;i <2;i++)
-    			  {
-    				  for(int j = -1 ; i<2;i++)
-    				  {
-    					  if(map.getChar(posX+i,posY+j) =='#') map.setChar(posX+i,posY+j,' ');
-    				  }
-    			  }
-    			 
+    			  map.destroyWalls(posX, posY);
         		  break;
     		  }
       	    break;
@@ -161,7 +148,7 @@ public class Robot {
       	    
       	    break;
     	  default:
-    	    destroyRobot();
+    	    map.destroyRobot(posX, posY);
     	    break;
     	}
     	c++;
@@ -203,23 +190,13 @@ public class Robot {
 	 * Add a certain amount of energy, can be negative but cannot go over 10 and on 0 or below the robot is destroyed
 	 */
 	public void addEnergy(int value) {
+		CombatMap map = CombatMap.getInstance();
 		this.energy += value;
 		if(this.energy > 10)
 			this.energy = 10;
 		else if(this.energy <= 0)
-			this.destroyRobot();
+			map.destroyRobot(posX, posY);
 	}
-	
-	public void destroyRobot() {
-		
-		//TODO
-	}
-    
-
- 
-
- 
- 
 }
 
 
