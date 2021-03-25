@@ -152,10 +152,10 @@ Diagram etat-transition (bouger robot)
 @startuml
 [*] --> bougerRobot 
 state bougerRobot {
-[*] --> analyseCaseDevant
-analyseCaseDevant --> Avancer : case vide
-analyseCaseDevant --> miner : case pleine
-miner --> Avancer
+state Avancer: after(temps déplacement)
+[*] --> Avancer
+Avancer --> miner : [position = position d'un objet]
+Avancer --> [*]
 state miner {
 [*] --> mine 
 mine : after(durreté *100 / efficacité)
@@ -163,8 +163,6 @@ mine --> [*]
 }
 miner -> [*] : [charge robot > charge max]
 miner --> [*] : [batterie <= 0]
-Avancer : after (tempsDéplacement)
-Avancer --> [*]
 }
 @enduml
 
