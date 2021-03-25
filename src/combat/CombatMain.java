@@ -1,16 +1,16 @@
 package combat;
 import combat.map.CombatMap;
-import combat.robot.Robot;
-
+import combat.robot.*;
 public class CombatMain {
 
 	public static void main(String[] args) {
-Robot Discovery = new combat.robot.Robot("Curiosity",10,5);
-        
+		PublicStack PS = PublicStack.getInstance();
 		CombatMap map = CombatMap.getInstance();
+		map.DisplayMap();   
+		while(map.turn() != 's');
 		
-		map.DiplayMap();
 		
 	}
 
 }
+      

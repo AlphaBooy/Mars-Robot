@@ -5,11 +5,12 @@ import java.io.File;  // Import the File class
 import java.io.FileNotFoundException;  // Import this class to handle errors
 import java.io.FileReader;
 import java.util.Scanner; // Import the Scanner class to read text files
+
 import map.Map;
 import map.MapObject;
 import combat.map.CombatMap;
 import combat.map.IsNotARobotException;
-import combat.robot.PublicStack;
+import combat.robot.*;
 import robot.Direction;
 
 public class Robot {
@@ -24,7 +25,7 @@ public class Robot {
     /** The current line of the robot's data log */
     private static int d;
     
-    private static int log[];
+    private static int commandLog[];
     
     private static String name;
    
@@ -38,7 +39,7 @@ public class Robot {
 		this.posY = posY;
 		this.d = 0;
 		this.c = 0;
-		this.log = new int[100];
+		this.commandLog = new int[100];
 		initBot();
 	}
  
@@ -52,7 +53,8 @@ public class Robot {
     
    
     public int getCommand() {
-    	return c;
+    	return commandLog[this.c];
+ 
     }
     public int getData()
     {
@@ -62,7 +64,13 @@ public class Robot {
     public String getName() {
     	return name;
     }
-    
+    public int getC()
+    {
+    	return c;
+    }
+    public int getEnergy() {
+    	return energy;
+    }
     public static void initBot() {
     	File robotFile= new File("files\\combat\\bots\\" +name+ ".txt");
     		
@@ -76,45 +84,55 @@ public class Robot {
     				 if (Character.isUpperCase(ch)){
     		                ch =Character.toLowerCase(ch);
     		         }
-    			    		  log[i] = ch;
+    			    		  commandLog[i] = ch;
     			    		  i++;
+    			    		  
     			}
     			
     			
     		} catch(Exception e) {
    	         // if any error occurs
    			e.printStackTrace();}
-    		c = 0;
-    		d++;
+   		 
     }
-    	
+    
     
     
 
-    private void executeCommand(char command){
+    public void executeCommand(){
     	int x,y;
     	CombatMap map = CombatMap.getInstance();
-    	switch(command) {
+    	PublicStack pStack = PublicStack.getInstance();
+    	switch(getCommand()) {
     	  case 'p':
-    		  PublicStack.stack(d);
+    		  pStack.stack(d);
+    		  System.out.printf("Action : p");
     	    break;
     	  case 'g':
-    	    y = PublicStack.getStack(PublicStack.getP());
+    	    y = pStack.unStack();
     	    
-    	    x = PublicStack.getStack(PublicStack.getP()-1);
+    	    x = pStack.unStack();
     	    
-    	    PublicStack.stack(x);
+    	    x = (x%2);
+    	    y = (y%2);
+    	    System.out.printf("Action : g");
+    	    
+
+    	    pStack.stack(x);
     	    break;
     	    
     	  case 'd':
-      	    d = PublicStack.unStack();
+      	    this.d = pStack.unStack();
+      	  System.out.printf("Action : d");
       	  break;
     	  case 'm':
-      	   d = PublicStack.unStack();
+      	   this.d = pStack.unStack();
+      	 System.out.printf("Action : m");
       	   break;
     	  case 'k':
     		  c = d;
         	   d =0;
+        	   System.out.printf("Action : k");
       	    break;
     	  case 'y':
     		  switch(d)
@@ -132,14 +150,9 @@ public class Robot {
     			  moveRobot(Direction.SOUTH);
         		  break;
     		  case '$' :
-    			  for(int i = -1;i <2;i++)
-    			  {
-    				  for(int j = -1 ; i<2;i++)
-    				  {
-    					  map.damageRobots(posX+i,posY+j);
-    				  }
-    			  }
     			 
+    					  map.damageRobots(posX,posY);
+ 
         		  break;
     		  case '%' :
         		  break;
@@ -154,17 +167,19 @@ public class Robot {
     			 
         		  break;
     		  }
+    		  System.out.printf("Action : y");
       	    break;
+      	 
     	  case 'i':
-      	    x = PublicStack.unStack();
-      	    y = PublicStack.unStack();
-      	    
+      	    x = pStack.unStack();
+      	    y = pStack.unStack();
+      	  System.out.printf("Action : i");
       	    break;
     	  default:
-    	    destroyRobot();
     	    break;
     	}
     	c++;
+    	System.out.printf("\n%d",c);
 
     	
     }
@@ -203,20 +218,14 @@ public class Robot {
 	 * Add a certain amount of energy, can be negative but cannot go over 10 and on 0 or below the robot is destroyed
 	 */
 	public void addEnergy(int value) {
+		CombatMap map = CombatMap.getInstance();
 		this.energy += value;
 		if(this.energy > 10)
 			this.energy = 10;
-		else if(this.energy <= 0)
-			this.destroyRobot();
+		else if(this.energy <= 0);
 	}
 	
-	public void destroyRobot() {
-		
-		//TODO
-	}
-    
-
- 
+	
 
  
  

@@ -5,10 +5,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 
 import combat.robot.Robot;
-import map.MapObject;
-import robot.Direction;
 
 
 public class CombatMap {
@@ -21,16 +20,18 @@ public class CombatMap {
     // the energy given by the batteries (represented by '%') on the map
     private final int energy_battery_value = 4;
     // A collection containing the names (and numbers) of robots to instantiate
-	private ArrayList<String> robotsNames = new ArrayList<String>(Arrays.asList("Curiosity","Discovery","Normandy"));
-    /**
+    String Names[] = {"Curiosity","Discovery","Normandy"};
+	private ArrayList<String> robotsNames =	 new ArrayList<String>(Arrays.asList(Names));
+    /**	
      * The representation of the map as characters
      */
     private char [][] map;
     
     // The array of robots currently presents on the map
     private ArrayList<Robot> robots;
+    private int turnCount =0;
     
-
+    public static final int MAX_TURN = 20;
 
 	/**
      * Load the given file and stores the characters in a matrix
@@ -95,6 +96,11 @@ public class CombatMap {
                     "of the map you've given. Please consider verify the path file and the validity and correct access" +
                     "right of the file." + e.getMessage());
         }
+        for (Robot rb : robots) {
+			
+			 System.out.printf("Robot : %s Vie : %d",rb.getName(),rb.getEnergy());
+        }
+		
     }
     /**
      * 
@@ -114,7 +120,7 @@ public class CombatMap {
     /**
      * Display a 2D representation of the current map in the console, using characters
      */
-    public void DiplayMap() {
+    public void DisplayMap() {
         /* For each char in the map char representation : */
         for (int i = 0; i < sizeY; i++) {
             for (int j = 0; j < sizeX; j++) {
@@ -219,4 +225,41 @@ public class CombatMap {
     		throw new IsNotARobotException("No robot found at the coordinates " + x + ";" + y);
     	return rb;
     }
+    public void destroyRobot(int x,int y) {
+    
+    	try {
+			this.robots.remove(getRobot(x,y));
+		} catch (IsNotARobotException e) {
+			e.printStackTrace();
+		}
+    	
+	}
+    public char turn() {
+    	Scanner sc = new Scanner(System.in);   
+    	char c = sc.next().charAt(0);   
+    	char endFlag = 0;
+   
+    	if(c == 't')
+    	{
+    		
+    		for (Robot rb : robots) {
+    			
+    			rb.executeCommand();
+    			 System.out.printf("Robot : %s Vie : %d\n",rb.getName(),rb.getEnergy());
+            }
+    		
+    	}
+    	if(c == 's')
+    	{
+    	 endFlag = 's';
+    	}
+    	
+    	DisplayMap();
+    	this.turnCount++;
+    	return endFlag;
+    	
+    }
+    
+
+ 
 }
