@@ -24,8 +24,8 @@ import map.Map;
 
 public class TestRobot {
     private Robot robot;
-    private static final String CHEMINCONFIG = "/Users/sylvain/Documents/projet-java-objectif-mars/files/robot/config_1.txt";
-    // private static final String CHEMINCONFIG = "files/robot/config_1.txt";
+    //private static final String CHEMINCONFIG = "/Users/sylvain/Documents/projet-java-objectif-mars/files/robot/config_1.txt";
+    private static final String CHEMINCONFIG = "files/robot/config_1.txt";
 
     @BeforeEach
     public void beforeEach(){

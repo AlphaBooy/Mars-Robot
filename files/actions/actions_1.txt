@@ -1,1 +1,1 @@
-rotate south,move,move,tourner ouest,avancer,avancer,tourner sud,avancer,avancer,avancer,avancer,avancer,avancer,avancer,tourner ouest,avancer
+rotate south,move,move,tourner ouest,avancer,avancer,tourner sud,avancer,avancer,avancer,avancer,avancer,avancer,avancer,tourner nord,avancer,avancer,avancer,avancer,avancer,touner est,avancer,avancer,tourner nord,avancer,avancer

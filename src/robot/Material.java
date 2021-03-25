@@ -21,6 +21,30 @@ public class Material {
         this.cost = cost;
     }
 
+    public Material(String name, String path) {
+        String lineContent = "";
+        File file = new File(path);
+        try (FileReader fr = new FileReader(file)) {
+            int charRead;
+            while ((charRead = fr.read()) != -1) {
+                if (charRead == '\n') {
+                    if (isLaser(lineContent.split(" ")[0]) && lineContent.split(" ")[0] == name) {
+                        this.object = new Laser(lineContent.split(" ")[0],
+                                Double.parseDouble(lineContent.split(" ")[2]));
+                    } else if (isBattery(lineContent.split(" ")[0])) {
+                        this.object = new Battery(lineContent.split(" ")[0],
+                                Double.parseDouble(lineContent.split(" ")[2]));
+                    }
+                    break;
+                }
+                lineContent += (char) charRead;
+            }
+        } catch (IOException e) {
+            System.err.println("ERROR: The material list file is missing or can't be reached." +
+                    "Please, make sure the program can access to \"" + path + "\"");
+        }
+    }
+
     /**
      * @return the default material list (composed of the default battery and the default laser)
      */
@@ -72,11 +96,35 @@ public class Material {
         return object.toString().split("'")[1];
     }
 
+    public int getCost() {
+        return cost;
+    }
+
     public Object getObject() {
         return object;
     }
 
     public String toString() {
         return "[Object: " + object.toString() + "; Cost: " + cost + "]";
+    }
+
+    public double getValue(String path, String name) {
+        String lineContent = "";
+        double value;
+        File file = new File(path);
+        try (FileReader fr = new FileReader(file)) {
+            int charRead;
+            while ((charRead = fr.read()) != -1) {
+                if (charRead == '\n') {
+                    if (lineContent.split(" ")[0] == name)
+                        return Double.parseDouble(lineContent.split(" ")[2]);
+                }
+                lineContent += (char) charRead;
+            }
+        } catch (IOException e) {
+            System.err.println("ERROR: The material list file is missing or can't be reached." +
+                    "Please, make sure the program can access to \"" + path + "\"");
+        }
+        return 0;
     }
 }
