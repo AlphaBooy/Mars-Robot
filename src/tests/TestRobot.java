@@ -20,11 +20,12 @@ import robot.Battery;
 import robot.Direction;
 import robot.Laser;
 import robot.Robot;
-import map.Map; 
+import map.Map;
+import map.MapObject; 
 
 public class TestRobot {
     private Robot robot;
-    //private static final String CHEMINCONFIG = "/Users/sylvain/Documents/projet-java-objectif-mars/files/robot/config_1.txt";
+    // private static final String CHEMINCONFIG = "/Users/sylvain/Documents/projet-java-objectif-mars/files/robot/config_1.txt";
     private static final String CHEMINCONFIG = "files/robot/config_1.txt";
 
     @BeforeEach
@@ -57,7 +58,7 @@ public class TestRobot {
         assertEquals(Direction.WEST, robot.getDirection(), "The direction should be the west");
     }
 
-    
+
     @Test
     @DisplayName("Move the robot")
     public void moveRobotTest(){
@@ -67,10 +68,14 @@ public class TestRobot {
         robot.move();
         assertEquals(--y, robot.getPosY(), "The posY should be decremented by 1");
         assertEquals(x, robot.getPosX(), "The posX shouln'd be incremented");
-        //Pour le tests de l'usure de la batterie, 
-        //Il faut regarder la case sur laquel il va s'avancer
-        //si elle est vide, la battery est usée de cout-deplacement
-        //si elle est pas vide elle est usée de la dureté du cailloux * 100
-        // assertEquals("The battery should be decremented by 0.0178", new Battery().getLevel() - 0.0178, robot.getBattery().getLevel(), 0.00001);
+
+        double hardness = new Map().getObject(robot.getPosX(), robot.getPosY()).getAttribute("hardness");
+        Battery battery = new Battery();
+        Laser laser = new Laser();
+        double usedPoint = hardness * 100 / robot.getLaser().getPower();
+        battery.useBattery(usedPoint);
+        laser.loosePower((long)usedPoint, robot.getConfig().get("emoussage_laser"));
+        assertEquals(battery.getLevel(), robot.getBattery().getLevel(), 0.01, "The battery should be decremented by " + hardness * 100 / robot.getLaser().getPower());
+        assertEquals(laser.getPower(), robot.getLaser().getPower(), "The laser should loose a little power (" + usedPoint + ")");
     }
 }
