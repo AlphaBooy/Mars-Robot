@@ -167,7 +167,7 @@ public class Robot {
             }
         } else {
             /* CASE --> The Map Object hasn't been mined yet so the delay is handled by the mining process */
-            this.mine(this.map);
+            this.mine();
         }
     }
 
@@ -179,29 +179,34 @@ public class Robot {
      */
     public void performActions(String... instructions) {
         for (String instruction : instructions) {
-            switch (instruction.toLowerCase()) {
+            switch (instruction.toLowerCase().split(" ")[0]) {
                 case "move": case "avancer":
                     this.move();
                     writeInResult("AVANCER,");
                     break;
-                case "rotate south": case "tourner sud":
-                    this.rotate(Direction.SOUTH);
-                    writeInResult("TOURNER SUD,");
+                case "rotate": case "tourner":
+                    switch (instruction.toLowerCase().split(" ")[1]) {
+                        case "south", "sud" -> {
+                            this.rotate(Direction.SOUTH);
+                            writeInResult("TOURNER SUD,");
+                        }
+                        case "north", "nord" -> {
+                            this.rotate(Direction.NORTH);
+                            writeInResult("TOURNER NORD,");
+                        }
+                        case "east", "est" -> {
+                            this.rotate(Direction.EAST);
+                            writeInResult("TOURNER EST,");
+                        }
+                        case "west", "ouest" -> {
+                            this.rotate(Direction.WEST);
+                            writeInResult("TOURNER OUEST,");
+                        }
+                    }
                     break;
-                case "rotate east": case "tourner est":
-                    this.rotate(Direction.EAST);
-                    writeInResult("TOURNER EST,");
-                    break;
-                case "rotate west": case "tourner ouest":
-                    this.rotate(Direction.WEST);
-                    writeInResult("TOURNER OUEST,");
-                    break;
-                case "rotate north": case "tourner nord":
-                    this.rotate(Direction.NORTH);
-                    writeInResult("TOURNER NORD,");
-                    break;
-                case "mine": case "miner":
-                    this.mine(this.map);
+                case "acheter": case "buy":
+                    buyMaterial(new Material(instruction.toLowerCase().split(" ")[1],"files/material/material_list_1.txt"));
+                    writeInResult("ACHETER " + instruction.toUpperCase().split(" ")[1] + ",");
                     break;
             }
         }
@@ -231,9 +236,8 @@ public class Robot {
 
     /**
      * Destroy a map object to get loot an ore that can be sold at a given value.
-     * @param map the map where the robot evolve
      */
-    private void mine(Map map) {
+    private void mine() {
         /* First, we get the object what is mined by the robot when the method is called */
         MapObject mo = map.getObject(this.posX, this.posY);
         /* Then we return the time needed to mine the MapObject (hardness * 100) / laser*/
@@ -310,6 +314,14 @@ public class Robot {
         return 0;
     }
 
+    public void buyMaterial(Material material) {
+        if (this.value > material.getCost()) {
+            this.value -= material.getCost();
+            if (Material.isLaser(material.getName()))
+                this.laser = new Laser(material.getName(), material.getValue("files/material/material_list_1.txt", material.getName()));
+        }
+    }
+
     public static void startGame() {
         String path = "files/results/run_" + getCurrentRunNumber();
         File resultFile = new File(path);
@@ -325,7 +337,12 @@ public class Robot {
     private static int getCurrentRunNumber() {
         File file = new File("files/results/current_number.txt");
         try (FileReader fr = new FileReader(file)) {
-            return fr.read();
+            int charRead;
+            String fileContent = "";
+            while ((charRead = fr.read()) != -1) {
+                fileContent += (char) charRead;
+            }
+            return Integer.parseInt(fileContent);
         } catch (IOException e) {
             System.err.println("ERROR: Missing file, critical error !");
             System.exit(1);

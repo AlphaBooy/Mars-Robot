@@ -27,7 +27,7 @@ public class Battery {
     public Battery() {
         this.name = "Default Battery";
         this.capacity = 200;
-        this.level = 100;
+        this.level = 200;
     }
 
     /**

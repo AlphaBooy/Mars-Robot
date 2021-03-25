@@ -230,6 +230,8 @@ public class Main extends Application {
         Scene scene = new Scene(borderPane);
         primaryStage.setScene(scene);
         //primaryStage.setFullScreen(true);
+        primaryStage.setWidth(1900);
+        primaryStage.setHeight(660);
         /* Display the scene on the primary stage  */
         primaryStage.show();
     }
