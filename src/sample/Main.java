@@ -155,6 +155,7 @@ public class Main extends Application {
                 listViewState.getItems().add(2,"Battery = " + String.format("%.2f", (robot.getBattery().getLevel() / robot.getBattery().getCapacity()) * 100) + " %");
                 listViewState.getItems().add(3,"Weight Carried = " + String.format("%.2f", (robot.getWeightCarried() / robot.getConfig().get("charge_maximale")) * 100) + " %");
                 listViewState.getItems().add(4,"Laser power = " + robot.getLaser().getPower());
+                listViewState.getItems().add(5,"Score = " + robot.getValue());
                 listViewState.refresh();
                 infos.add(listViewState,0,1);
                 Label titleListConfig = new Label("Configuration of the robot :");

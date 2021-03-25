@@ -24,6 +24,7 @@ public class Robot {
     private double weightCarried;
 
     public static final String PATH_TO_IMAGE = "textures/robot.png";
+    public static final int ACCELERATION_FACTOR = 1;
 
     /**
      * Generate the default robot object.
@@ -123,7 +124,7 @@ public class Robot {
         this.battery.useBattery(this.config.get("cout_rotation"));
         try {
             /* The program waits the necessary time for the robot to rotate */
-            Thread.sleep((long)(this.config.get("temps_rotation") * 1000));
+            Thread.sleep((long)(this.config.get("temps_rotation") * 1000) / ACCELERATION_FACTOR);
         } catch (InterruptedException e) {
             System.err.println("ERROR: You tried to stop (or change) the program while the robot was rotating." +
                     "The program will stop immediately to avoid any further issues.");
@@ -156,7 +157,7 @@ public class Robot {
             this.battery.useBattery(this.config.get("cout_deplacement"));
             try {
                 /* Wait enought time for the robot to move on the map. Durations are converted in milliseconds (*1000) */
-                Thread.sleep((long) (this.config.get("temps_deplacement_vide") * 1000));
+                Thread.sleep((long) (this.config.get("temps_deplacement_vide") * 1000) / ACCELERATION_FACTOR);
             } catch (InterruptedException e) {
                 System.err.println("ERROR: You tried to stop (or change) the program while the robot was moving." +
                         "The program will stop immediately to avoid any further issues.");
@@ -207,7 +208,6 @@ public class Robot {
                     break;
             }
         }
-        //gameOver(); // When all instructions over :
     }
 
     /**
@@ -242,7 +242,7 @@ public class Robot {
         long time = (long)((mo.getAttribute("hardness") * 100) / this.laser.getPower());
         try {
             /* Wait the time needed by the robot to mine the MapObject */
-            Thread.sleep(time * 1000);
+            Thread.sleep((time * 1000) / ACCELERATION_FACTOR);
         } catch (InterruptedException e) {
             System.err.println("ERROR: You tried to stop (or change) the program while the robot was mining." +
                     "The program will stop immediately to avoid any further issues.");
@@ -299,15 +299,15 @@ public class Robot {
         switch (action.toLowerCase()) {
             case "move": case "avancer":
                 if (map.getObject(this.posX, this.posY).getName() == "void" || map.getObject(this.posX, this.posY).getName() == "base") {
-                    return this.config.get("temps_deplacement_vide");
+                    return (this.config.get("temps_deplacement_vide")) / ACCELERATION_FACTOR;
                 }
                 MapObject mo = map.getObject(this.posX, this.posY);
-                return (mo.getAttribute("hardness") * 100) / this.laser.getPower();
+                return ((mo.getAttribute("hardness") * 100) / this.laser.getPower()) / ACCELERATION_FACTOR;
             case "rotate south": case "tourner sud":
             case "rotate east": case "tourner est":
             case "rotate west": case "tourner ouest":
             case "rotate north": case "tourner nord":
-                return this.config.get("temps_rotation");
+                return this.config.get("temps_rotation") / ACCELERATION_FACTOR;
         }
         return 0;
     }
@@ -349,11 +349,10 @@ public class Robot {
     }
 
     private static void setCurrentNumber() {
-
         String path = "files/results/current_number.txt";
-        File resultFile = new File(path);
+        File savedCurrentRunNumberFile = new File(path);
         try {
-            FileWriter myWriter = new FileWriter(resultFile);
+            BufferedWriter myWriter = new BufferedWriter(new FileWriter(savedCurrentRunNumberFile));
             myWriter.write(getCurrentRunNumber() + 1);
             myWriter.close();
         } catch (IOException e) {
