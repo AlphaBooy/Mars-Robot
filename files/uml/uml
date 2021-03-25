@@ -1,10 +1,12 @@
 This file contains the plain text to use with planUml (https://plantuml.com/fr/) to generate the uml diagram
 
-diagram needed : 
-- cas d'utilisation 
-- class
+
+
+diagram needed for all parts (we need 10 diagrams): 
+- cas d'utilisation ✅
+- class ✅
 - séquence 
-- état-transition (2)
+- état-transition (2) ✅(1/2)
 
 
 diagram class
@@ -68,7 +70,12 @@ class Battery {
 -emptyBattery(): void
 
 }
-enum Direction
+enum Direction {
+NORTH
+EAST
+SOUTH
+WEST
+}
 
 class Laser {
 -name: String
@@ -115,8 +122,11 @@ class MapObject {
 
 Robot *-- Battery
 Robot *-- Laser
-Robot *-- Map
+Robot o-- Map
 Map o-- MapObject
+Material <|-- Laser
+Material <|-- Battery
+Robot o-- Direction
 @enduml
 
 
@@ -144,10 +154,10 @@ Diagram etat-transition (bouger robot)
 @startuml
 [*] --> bougerRobot 
 state bougerRobot {
-[*] --> analyseCaseDevant
-analyseCaseDevant --> Avancer : case vide
-analyseCaseDevant --> miner : case pleine
-miner --> Avancer
+state Avancer: after(temps déplacement)
+[*] --> Avancer
+Avancer --> miner : [position = position d'un objet]
+Avancer --> [*]
 state miner {
 [*] --> mine 
 mine : after(durreté *100 / efficacité)
@@ -155,8 +165,6 @@ mine --> [*]
 }
 miner -> [*] : [charge robot > charge max]
 miner --> [*] : [batterie <= 0]
-Avancer : after (tempsDéplacement)
-Avancer --> [*]
 }
 @enduml
 
