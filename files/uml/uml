@@ -68,7 +68,12 @@ class Battery {
 -emptyBattery(): void
 
 }
-enum Direction
+enum Direction {
+NORTH
+EAST
+SOUTH
+WEST
+}
 
 class Laser {
 -name: String
@@ -115,8 +120,11 @@ class MapObject {
 
 Robot *-- Battery
 Robot *-- Laser
-Robot *-- Map
+Robot o-- Map
 Map o-- MapObject
+Material <|-- Laser
+Material <|-- Battery
+Robot o-- Direction
 @enduml
 
 
