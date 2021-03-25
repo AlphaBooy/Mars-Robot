@@ -1,10 +1,12 @@
 This file contains the plain text to use with planUml (https://plantuml.com/fr/) to generate the uml diagram
 
-diagram needed : 
-- cas d'utilisation 
-- class
+
+
+diagram needed for all parts (we need 10 diagrams): 
+- cas d'utilisation ✅
+- class ✅
 - séquence 
-- état-transition (2)
+- état-transition (2) ✅(1/2)
 
 
 diagram class
