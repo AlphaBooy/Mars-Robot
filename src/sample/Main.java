@@ -246,9 +246,8 @@ public class Main extends Application {
         /* Add the GridPane into the scene panel */
         Scene scene = new Scene(borderPane);
         primaryStage.setScene(scene);
-        //primaryStage.setFullScreen(true);
-        primaryStage.setWidth(1880);
-        primaryStage.setHeight(660);
+        primaryStage.setWidth(1520);
+        primaryStage.setHeight(560);
         /* Display the scene on the primary stage  */
         primaryStage.show();
     }

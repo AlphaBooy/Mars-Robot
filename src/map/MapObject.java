@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class MapObject {
+    public static final String FILES_MEASURES = "files/measures/measure_1.txt";
     /** Position of the object within a line */
     private int posX;
     /** Position of the object within a collumn */
@@ -58,7 +59,7 @@ public class MapObject {
             return "Base"; // Case: The char given is the base (not in the file of materials)
         if (representation == ' ')
             return "void"; // The object has been destroyed and must be replaced by nothing ==> "void"
-        String [] fileContent = readMapObjectsFile("files/measures/measure_1.txt");
+        String [] fileContent = readMapObjectsFile(FILES_MEASURES);
         /* Then, we exploit the array we made to get the name of the object thanks to it's representation */
         for (int i = 0; i < fileContent.length; i++) {
             if (fileContent[i] == null) {
@@ -88,6 +89,7 @@ public class MapObject {
      */
     public int getAttribute(String element) {
         int index;
+        /* Determining which of the attributes the program needs (add genericity to the method) */
         switch (element) {
             case "value": case "valeur":
                 index = 3;
@@ -99,26 +101,45 @@ public class MapObject {
                 index = 1;
                 break;
             default:
+                /* Rise an exception if the method is called with an illegal argument */
                 throw new IllegalStateException("Unexpected value: " + element);
         }
-        String [] fileContent = readMapObjectsFile("files/measures/measure_1.txt");
+        /* Get the measure file and read it to parse it */
+        String [] fileContent = readMapObjectsFile(FILES_MEASURES);
+        /* Reading each lines of the file */
         for (int i = 0; i < fileContent.length; i++) {
             String[] fileContentSplit = fileContent[i].split(" ");
-            /* Reading each lines of the file */
-            if (fileContentSplit[0].charAt(0) == this.mapRepresentation)
-                return Integer.parseInt(fileContentSplit[fileContentSplit.length - index]);
+            try {
+                /* If the representation is at the start of the line : this is the item that we want */
+                if (fileContentSplit[0].charAt(0) == this.mapRepresentation)
+                    /* Then we can return the attribute needed by the program */
+                    System.out.println(fileContentSplit[fileContentSplit.length - index]);
+                    return Integer.parseInt(fileContentSplit[fileContentSplit.length - index]);
+            } catch (NumberFormatException e) {
+                System.err.println("ERROR: When parsing the measures of the map, can't find : " + element + " of " + this.name + ". Stopping !");
+                System.exit(1);
+            }
         }
-        return -1;
+        return 0; // Because we have to return a value !
     }
 
+    /**
+     * @return the X position of the map object
+     */
     public int getPosX() {
         return posX;
     }
 
+    /**
+     * @return the Y position of the map object
+     */
     public int getPosY() {
         return posY;
     }
 
+    /**
+     * Destroy a map object. Basically, change the representation with a ' ' and the name to void
+     */
     public void destroy() {
         this.mapRepresentation = ' ';
         this.name = "void";
@@ -133,18 +154,30 @@ public class MapObject {
         return name + " [x:" + posX + ", y:" + posY + ", " + mapRepresentation + "]";
     }
 
+    /**
+     * Read map objects from a text file.
+     * The file will contain all possible items that can be placed in the map except m
+     * - The base that is unique on the map and don't have attributes like "normal objects"
+     * - The "void" item which is set when the robot break an item on the map and don't have any attributes either
+     * @param path The path of the text file that will be read by the method
+     * @return a String array representing all items that can be displayed on the map
+     */
     private String[] readMapObjectsFile(String path) {
-        String[] fileContent = new String[7]; // Up to 50 possible ores on the map
+        String[] fileContent = new String[50]; // Up to 50 possible ores on the map
         /* First, we get, line by line, the content of the file describing all MapObjects */
         File file = new File(path);
         try (FileReader fr = new FileReader(file)) {
             int charRead, i = 0;
+            /* Read every char of the text file until the end of the file (char = -1) */
             while ((charRead = fr.read()) != -1) {
+                /* We can't process a "null" within this method so we deal with void strings instead */
                 fileContent[i] = fileContent[i] == null ? "" : fileContent[i];
+                /* We hit the end of a line, this is another object */
                 if (charRead == '\n') {
                     i++;
                     continue;
                 }
+                /* Append the char read to a String representation that can be returned */
                 fileContent[i] += (char) charRead;
             }
         } catch (IOException e) {
