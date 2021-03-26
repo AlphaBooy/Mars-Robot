@@ -64,7 +64,7 @@ public class CombatMap {
         try (FileReader fr = new FileReader(file)) {
             int charRead;
             int numLigne = 0, numColonne = 0;
-            this.map = new char[sizeY][sizeX+1]; //The size is a number of characters and in a text file the cursor can be placed between every character horizontally, hence the +1 
+            this.map = new char[sizeX+1][sizeY]; //The size is a number of characters and in a text file the cursor can be placed between every character horizontally, hence the +1
             /* While we read a char that is considered as the end of the file by FileReader : */
             this.robots = new ArrayList<Robot>();
             while ((charRead = fr.read()) != -1) {
@@ -76,7 +76,7 @@ public class CombatMap {
                 } else {
                     if(charRead == '@') { //If the char is a robot we add it to the robots list
                     	if(robotsNames.size() > 0) { // It is also necessary to have robots names left
-	                    	Robot rb = new Robot(robotsNames.get(0),numLigne,numColonne);
+	                    	Robot rb = new Robot(robotsNames.get(0),numColonne,numLigne);
 	                    	robots.add(rb);
 	                    	robotsNames.remove(0);
                     	}else { // Else there are no more robots to add so we replace it by an empty space
@@ -84,7 +84,7 @@ public class CombatMap {
                     	}
                     }
                     // We can save it onto our array of representation
-                    this.map[numLigne][numColonne] = (char) charRead;
+                    this.map[numColonne][numLigne] = (char) charRead;
                     numColonne++; // After that, we increase our position within the array
                 }
             }
@@ -116,15 +116,22 @@ public class CombatMap {
 	public int getSizeY() {
 		return sizeY;
 	}
-    
+
+	/**
+	 *
+	 * @return the matrix containing the chars of the map
+	 */
+	public char[][] getMap() {return map;}
+
     /**
      * Display a 2D representation of the current map in the console, using characters
      */
     public void DisplayMap() {
         /* For each char in the map char representation : */
-        for (int i = 0; i < sizeY; i++) {
-            for (int j = 0; j < sizeX; j++) {
-                System.out.print(this.map[i][j]);
+		System.out.println();
+        for (int j = 0; j < sizeY; j++) {
+            for (int i = 0; i < sizeX; i++) {
+                System.out.print(getChar(i,j));
             }
             System.out.println();
         }
