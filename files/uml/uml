@@ -189,3 +189,19 @@ else position no available
 Map -> Robot : Out of the map game over
 end
 @enduml
+
+diagram etat-transition (acheter Materiel - part1)
+@startuml
+[*] --> AcheterMateriel
+state AcheterMateriel {
+[*] --> DemandeMateriel
+DemandeMateriel -> [*] : [position robot != position base]
+DemandeMateriel --> AcheterEquipement : [position robot == position base]
+
+AcheterEquipement -> [*] : [materiel.cost > robot.value]
+AcheterEquipement --> EquiperMateriel : [robot.value >= materiel.cost]
+EquiperMateriel : after(temps_installation)
+EquiperMateriel -> [*]
+
+}
+@enduml
