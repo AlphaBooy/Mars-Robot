@@ -23,6 +23,8 @@ public class Robot {
     /** The weight carried by the robot. If it's heavier than the max weight the robot can carried, it stop */
     private double weightCarried;
 
+    public static final String FILES_MATERIAL_MATERIAL_LIST_1_TXT = "files/material/material_list_1.txt";
+    public static final String FILES_RESULTS_CURRENT_NUMBER = "files/results/current_number.txt";
     public static final String PATH_TO_IMAGE = "textures/robot.png";
     public static final int ACCELERATION_FACTOR = 1;
 
@@ -151,6 +153,9 @@ public class Robot {
         } else if (this.getDirection() == Direction.NORTH) {
             posY--;
         }
+        /* We unload the robot when we hit the base */
+        if (map.getObject(this.posX, this.posY).getName() == "base")
+            this.weightCarried = 0;
         /* CASE --> the robot evolve on a mined MapObject or on the base : the movement time is the minimum one */
         if (map.getObject(this.posX, this.posY).getName() == "void" || map.getObject(this.posX, this.posY).getName() == "base") {
             /* Use the necessary energy from the battery to move the robot forward. The robot'll stop if battery < 0 */
@@ -203,9 +208,11 @@ public class Robot {
                     }
                     break;
                 case "acheter": case "buy":
-                    buyMaterial(new Material(instruction.toLowerCase().split(" ")[1],"files/material/material_list_1.txt"));
+                    buyMaterial(new Material(instruction.toLowerCase().split(" ")[1],FILES_MATERIAL_MATERIAL_LIST_1_TXT));
                     writeInResult("ACHETER " + instruction.toUpperCase().split(" ")[1] + ",");
                     break;
+                default:
+                    gameOver();
             }
         }
     }
@@ -296,27 +303,34 @@ public class Robot {
     }
 
     public double getActionDuration(String action) {
-        switch (action.toLowerCase()) {
+        switch (action.toLowerCase().split(" ")[0]) {
             case "move": case "avancer":
                 if (map.getObject(this.posX, this.posY).getName() == "void" || map.getObject(this.posX, this.posY).getName() == "base") {
                     return (this.config.get("temps_deplacement_vide")) / ACCELERATION_FACTOR;
                 }
                 MapObject mo = map.getObject(this.posX, this.posY);
                 return ((mo.getAttribute("hardness") * 100) / this.laser.getPower()) / ACCELERATION_FACTOR;
-            case "rotate south": case "tourner sud":
-            case "rotate east": case "tourner est":
-            case "rotate west": case "tourner ouest":
-            case "rotate north": case "tourner nord":
+            case "rotate": case "tourner":
                 return this.config.get("temps_rotation") / ACCELERATION_FACTOR;
+            case "acheter": case "buy":
+                return this.getConfig().get("temps_installation") * 1000 / ACCELERATION_FACTOR;
         }
         return 0;
     }
 
     public void buyMaterial(Material material) {
-        if (this.value > material.getCost()) {
+        if (this.value > material.getCost() && this.posX == map.getBase().getPosX() && this.posY == map.getBase().getPosY()) {
             this.value -= material.getCost();
             if (Material.isLaser(material.getName()))
-                this.laser = new Laser(material.getName(), material.getValue("files/material/material_list_1.txt", material.getName()));
+                this.laser = new Laser(material.getName(), material.getValue(FILES_MATERIAL_MATERIAL_LIST_1_TXT, material.getName()));
+            if (Material.isBattery(material.getName()))
+                this.battery = new Battery(material.getName(), material.getValue(FILES_MATERIAL_MATERIAL_LIST_1_TXT, material.getName()));
+            try {
+                Thread.sleep((long) (this.getConfig().get("temps_installation") * 1000) / ACCELERATION_FACTOR);
+            } catch (InterruptedException e) {
+                System.err.println("ERROR: You tried to stop (or change) the program while the robot was equipping an item." +
+                        "The program will stop immediately to avoid any further issues.");
+            }
         }
     }
 
@@ -333,14 +347,19 @@ public class Robot {
     }
 
     private static int getCurrentRunNumber() {
-        File file = new File("files/results/current_number.txt");
+        File file = new File(FILES_RESULTS_CURRENT_NUMBER);
         try (FileReader fr = new FileReader(file)) {
             int charRead;
             String fileContent = "";
             while ((charRead = fr.read()) != -1) {
                 fileContent += (char) charRead;
             }
+
             return Integer.parseInt(fileContent);
+        } catch (NumberFormatException formatException) {
+            System.err.println("ERROR: Wrong number of run detected, replaced with default 'run_1'. Waiting for you to" +
+                    "patch this issue manually");
+            return 1;
         } catch (IOException e) {
             System.err.println("ERROR: Missing file, critical error !");
             System.exit(1);
@@ -349,7 +368,7 @@ public class Robot {
     }
 
     private static void setCurrentNumber() {
-        String path = "files/results/current_number.txt";
+        String path = FILES_RESULTS_CURRENT_NUMBER;
         File savedCurrentRunNumberFile = new File(path);
         try {
             BufferedWriter myWriter = new BufferedWriter(new FileWriter(savedCurrentRunNumberFile));
