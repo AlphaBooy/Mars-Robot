@@ -191,17 +191,23 @@ end
 @enduml
 
 diagram etat-transition (acheter Materiel - part1)
+
 @startuml
 [*] --> AcheterMateriel
 state AcheterMateriel {
 [*] --> DemandeMateriel
-DemandeMateriel -> [*] : [position robot != position base]
-DemandeMateriel --> AcheterEquipement : [position robot == position base]
+state c <<choice>>
+DemandeMateriel --> c : [position robot == position base]
 
-AcheterEquipement -> [*] : [materiel.cost > robot.value]
-AcheterEquipement --> EquiperMateriel : [robot.value >= materiel.cost]
+c --> [*] : [false]
+c --> AcheterEquipement : [true]
+
+state d <<choice>>
+AcheterEquipement --> d : [robot.value >= materiel.cost]
+d --> [*] : [false]
+d --> EquiperMateriel : [true]
 EquiperMateriel : after(temps_installation)
-EquiperMateriel -> [*]
+EquiperMateriel --> [*]
 
 }
 @enduml
