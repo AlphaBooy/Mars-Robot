@@ -168,3 +168,46 @@ miner --> [*] : [batterie <= 0]
 }
 @enduml
 
+digramm sequence 
+
+@startuml
+actor Robot
+participant Map
+
+Robot -> Map : move
+alt position aviable
+Map -> Robot : new position
+Robot -> Map : object ? 
+
+alt yes 
+Map -> Robot : Object caracteristic
+Robot -> Map : i have destoyed the object
+else no
+Map -> Robot : empty case
+end
+else position no available
+Map -> Robot : Out of the map game over
+end
+@enduml
+
+diagram etat-transition (acheter Materiel - part1)
+
+@startuml
+[*] --> AcheterMateriel
+state AcheterMateriel {
+[*] --> DemandeMateriel
+state c <<choice>>
+DemandeMateriel --> c : [position robot == position base]
+
+c --> [*] : [false]
+c --> AcheterEquipement : [true]
+
+state d <<choice>>
+AcheterEquipement --> d : [robot.value >= materiel.cost]
+d --> [*] : [false]
+d --> EquiperMateriel : [true]
+EquiperMateriel : after(temps_installation)
+EquiperMateriel --> [*]
+
+}
+@enduml
