@@ -168,3 +168,24 @@ miner --> [*] : [batterie <= 0]
 }
 @enduml
 
+digramm sequence 
+
+@startuml
+actor Robot
+participant Map
+
+Robot -> Map : move
+alt position aviable
+Map -> Robot : new position
+Robot -> Map : object ? 
+
+alt yes 
+Map -> Robot : Object caracteristic
+Robot -> Map : i have destoyed the object
+else no
+Map -> Robot : empty case
+end
+else position no available
+Map -> Robot : Out of the map game over
+end
+@enduml
