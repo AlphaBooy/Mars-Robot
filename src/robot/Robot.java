@@ -353,7 +353,7 @@ public class Robot {
         File savedCurrentRunNumberFile = new File(path);
         try {
             BufferedWriter myWriter = new BufferedWriter(new FileWriter(savedCurrentRunNumberFile));
-            myWriter.write(getCurrentRunNumber() + 1);
+            myWriter.write((char) (getCurrentRunNumber() + 1));
             myWriter.close();
         } catch (IOException e) {
             System.err.println("ERROR: Can't create the result file ! Make sure the program has access to the result repository.");

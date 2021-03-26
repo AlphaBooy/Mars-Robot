@@ -2,6 +2,10 @@ package sample;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -147,16 +151,23 @@ public class Main extends Application {
             Platform.runLater(() -> {
                 Label titleListState = new Label("State of the robot :");
                 infos.add(titleListState,0,0);
+                /* All items are set in an observable list that can self refresh to display robot statistics */
+                ObservableList<Stats> items = FXCollections.observableArrayList(Stats.extractor());
+                Stats item_1 = new Stats();
+                items.add(item_1);
+                Stats item_2 = new Stats();
+                items.add(item_2);
+                Stats item_3 = new Stats();
+                items.add(item_3);
+                Stats item_4 = new Stats();
+                items.add(item_4);
+                Stats item_5 = new Stats();
+                items.add(item_5);
+                Stats item_6 = new Stats();
+                items.add(item_6);
                 /* A list view that display the current state of the robot (position, battery state, laser...) */
-                ListView<String> listViewState = new ListView<>();
-                listViewState.setDisable(true);
-                listViewState.getItems().add(0,"X = " + robot.getPosX());
-                listViewState.getItems().add(1,"Y = " + robot.getPosY());
-                listViewState.getItems().add(2,"Battery = " + String.format("%.2f", (robot.getBattery().getLevel() / robot.getBattery().getCapacity()) * 100) + " %");
-                listViewState.getItems().add(3,"Weight Carried = " + String.format("%.2f", (robot.getWeightCarried() / robot.getConfig().get("charge_maximale")) * 100) + " %");
-                listViewState.getItems().add(4,"Laser power = " + robot.getLaser().getPower());
-                listViewState.getItems().add(5,"Score = " + robot.getValue());
-                listViewState.refresh();
+                ListView<Stats> listViewState = new ListView<Stats>(items);
+                listViewState.setItems(items);
                 infos.add(listViewState,0,1);
                 Label titleListConfig = new Label("Configuration of the robot :");
                 infos.add(titleListConfig,0,2);
@@ -167,7 +178,7 @@ public class Main extends Application {
                     listViewConfig.getItems().add(key + " = " + value);
                 });
                 infos.add(listViewConfig,0,3);
-                try {
+                /*try {
                     Image batteryLogo = new Image(new FileInputStream("textures/menu/" + robot.getBattery().getImageName() + ".png"));
                     ImageView batteryLogoView = new ImageView(batteryLogo);
                     batteryLogoView.setFitHeight(BLOCK_SIZE);
@@ -176,9 +187,14 @@ public class Main extends Application {
                 } catch (FileNotFoundException e) {
                     System.err.println("ERROR: Unable to find some textures necessary for the good program behavior.");
                     System.exit(1);
-                }
+                }*/
                 Platform.runLater(() -> {
-                    listViewConfig.refresh();
+                    item_1.name.set("X = " + robot.getPosX());
+                    item_2.name.set("Y = " + robot.getPosY());
+                    item_3.name.set("Battery = " + String.format("%.2f", (robot.getBattery().getLevel() / robot.getBattery().getCapacity()) * 100) + " %");
+                    item_4.name.set("Weight Carried = " + String.format("%.2f", (robot.getWeightCarried() / robot.getConfig().get("charge_maximale")) * 100) + " %");
+                    item_5.name.set("Laser power = " + String.format("%.2f", robot.getLaser().getPower()));
+                    item_6.name.set("Score = " + robot.getValue());
                     listViewState.refresh();
                 });
             });
@@ -231,7 +247,7 @@ public class Main extends Application {
         Scene scene = new Scene(borderPane);
         primaryStage.setScene(scene);
         //primaryStage.setFullScreen(true);
-        primaryStage.setWidth(1900);
+        primaryStage.setWidth(1880);
         primaryStage.setHeight(660);
         /* Display the scene on the primary stage  */
         primaryStage.show();
