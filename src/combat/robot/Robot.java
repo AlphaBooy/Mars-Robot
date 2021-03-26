@@ -20,14 +20,14 @@ public class Robot {
     private int posX;
     /** The Y position of the robot (supposed to evolve) */
     private int posY;
-    /** The current line of the robot's command log */
-    private static int c;
-    /** The current line of the robot's data log */
-    private static int d;
+    /** The robot's C record */
+    private int c;
+    /** The robot's D record */
+    private int d;
+    /** The robot's command log */
+    private int commandLog[];
     
-    private static int commandLog[];
-    
-    private static String name;
+    private String name;
    
 
     
@@ -40,7 +40,7 @@ public class Robot {
 		this.d = 0;
 		this.c = 0;
 		this.commandLog = new int[100];
-		initBot();
+		initBot(chosenName);
 	}
  
     public int getPosX() {
@@ -71,8 +71,8 @@ public class Robot {
     public int getEnergy() {
     	return energy;
     }
-    public static void initBot() {
-    	File robotFile= new File("files\\combat\\bots\\" +name+ ".txt");
+    public  void initBot(String name) {
+    	File robotFile= new File("files\\combat\\bots\\" + name + ".txt");
     		
     		try {
     			BufferedReader r = new BufferedReader(new FileReader(robotFile));
@@ -96,7 +96,12 @@ public class Robot {
    		 
     }
     
-    
+    public int AND(int a,int b) {
+        int value1 = a;
+        int value2 = b;
+        int result = value1 & value2;
+        return result;
+    }
     
 
     public void executeCommand(){
@@ -105,7 +110,7 @@ public class Robot {
     	PublicStack pStack = PublicStack.getInstance();
     	switch(getCommand()) {
     	  case 'p':
-    		  pStack.stack(d);
+    		  pStack.stack(this.d);
     		  System.out.printf("Action : p");
     	    break;
     	  case 'g':
@@ -115,9 +120,11 @@ public class Robot {
     	    
     	    x = (x%2);
     	    y = (y%2);
+    	    x= AND(x,y);
+    	    x = (~x);
     	    System.out.printf("Action : g");
     	    
-
+    	    
     	    pStack.stack(x);
     	    break;
     	    
@@ -130,42 +137,45 @@ public class Robot {
       	 System.out.printf("Action : m");
       	   break;
     	  case 'k':
-    		  c = d;
-        	   d =0;
+    		   //d =c;
+    		   //d = 0;
         	   System.out.printf("Action : k");
       	    break;
     	  case 'y':
-    		  switch(d)
+    		  switch(this.d)
     		  {
     		  case ' ' :
     			  moveRobot(Direction.EAST);
+    			  System.out.printf("Action : y  ");
     			  break;
     		  case '!' :
     			  moveRobot(Direction.NORTH);
+    			  System.out.printf("Action : y !");
         		  break;
     		  case '"' :
     			  moveRobot(Direction.WEST);
+    			  System.out.printf("Action : y " + '"');
         		  break;
     		  case '#' :
     			  moveRobot(Direction.SOUTH);
+    			  System.out.printf("Action : y #");
         		  break;
     		  case '$' :
-
-    			 
-    					  map.damageRobots(posX,posY);
- 
-
-				  map.damageRobots(posX, posY);
-
+    			 map.damageRobots(posX,posY);
+    			 System.out.printf("Action : y $");
         		  break;
     		  case '%' :
     			  map.rechargeRobots(posX, posY);
+    			  System.out.printf("Action : y %");
         		  break;
     		  case '&' :
     			  map.destroyWalls(posX, posY);
+    			  System.out.printf("Action : y &\n");
         		  break;
+        	default :
+        		System.out.printf("Bruh moment \n");
     		  }
-    		  System.out.printf("Action : y");
+    		  
       	    break;
       	 
     	  case 'i':

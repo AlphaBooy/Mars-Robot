@@ -4,8 +4,8 @@ import combat.map.CombatMap;
 import combat.map.IsNotARobotException;
 
 public class PublicStack {
-	private static int stack[];
-	private static int p;
+	private  int stack[];
+	private int p;
 	
 	private static volatile PublicStack instance = null;
 	 
@@ -22,32 +22,32 @@ public class PublicStack {
 	    	}
 	    	return instance;
 	 }
-	public PublicStack() {
+	private PublicStack() {
 		this.stack = new int[100];
 		this.p = 0;
 	}
-	public static int getP() {
-		return p;
+	public  int getP() {
+		return this.p;
 	}
 	
-	public static int getStack(int pos) {
-		return stack[pos];
+	public int getStack(int pos) {
+		return this.stack[pos];
 	}
-	public static void setStack(int value) {
-		stack[p] = value;
+	public void setStack(int value) {
+		this.stack[p] = value;
 	}
-	public static void stack(int value) {
-		stack[p]=value;
-		p++;	
+	public void stack(int value) {
+		this.stack[p]=value;
+		this.p++;	
 	}
-	public static int unStack() {
+	public int unStack() {
 		int unstackedValue;
-		unstackedValue = stack[p];
-		p--;
-		if(p < 0)
+		unstackedValue = this.stack[p];
+		this.p--;
+		if(this.p < 0)
 		{
 			unstackedValue = -1;
-			p = 0;
+			this.p = 0;
 		}
 		return unstackedValue;
 	}

@@ -20,8 +20,8 @@ public class CombatMap {
     // the energy given by the batteries (represented by '%') on the map
     private final int energy_battery_value = 4;
     // A collection containing the names (and numbers) of robots to instantiate
-    String Names[] = {"Curiosity","Discovery","Normandy"};
-	private ArrayList<String> robotsNames =	 new ArrayList<String>(Arrays.asList(Names));
+   
+	private ArrayList<String> robotsNames =	 new ArrayList<String>(Arrays.asList("Curiosity","Discovery","Normandy"));
     /**	
      * The representation of the map as characters
      */
@@ -29,7 +29,7 @@ public class CombatMap {
     
     // The array of robots currently presents on the map
     private ArrayList<Robot> robots;
-    private int turnCount =0;
+    private static int turnCount =0;
     
     public static final int MAX_TURN = 20;
 
@@ -299,21 +299,27 @@ public class CombatMap {
    
     	if(c == 't')
     	{
-    		
+    		if(turnCount == MAX_TURN)
+    		{
+    			endFlag = 's';
+    		}
+    		else
+    		{
     		for (Robot rb : robots) {
-    			
-    			rb.executeCommand();
-    			 System.out.printf("Robot : %s Vie : %d\n",rb.getName(),rb.getEnergy());
+
+    			 rb.executeCommand();
             }
-    		
+    		DisplayMap();
+    		this.turnCount++;
+    		}
     	}
     	if(c == 's')
     	{
     	 endFlag = 's';
     	}
     	
-    	DisplayMap();
-    	this.turnCount++;
+    	
+    	
     	return endFlag;
     	
     }
