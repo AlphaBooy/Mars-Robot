@@ -105,13 +105,13 @@ public class Robot {
     
 
     public void executeCommand(){
-    	int x,y;
+    	int x,y,z;
     	CombatMap map = CombatMap.getInstance();
     	PublicStack pStack = PublicStack.getInstance();
     	switch(getCommand()) {
     	  case 'p':
     		  pStack.stack(this.d);
-    		  System.out.printf("Action : p");
+    		  System.out.printf("Action : p\n");
     	    break;
     	  case 'g':
     	    y = pStack.unStack();
@@ -120,26 +120,26 @@ public class Robot {
     	    
     	    x = (x%2);
     	    y = (y%2);
-    	    x= AND(x,y);
-    	    x = (~x);
-    	    System.out.printf("Action : g");
+    	    z= AND(x,y);
+    	    z = (~z);
+    	    System.out.printf("Action : g\n");
     	    
     	    
-    	    pStack.stack(x);
+    	    pStack.stack(z);
     	    break;
     	    
     	  case 'd':
       	    this.d = pStack.unStack();
-      	  System.out.printf("Action : d");
+      	  System.out.printf("Action : d\n");
       	  break;
     	  case 'm':
       	   this.d = pStack.unStack();
-      	 System.out.printf("Action : m");
+      	 System.out.printf("Action : m\n");
       	   break;
     	  case 'k':
-    		   //d =c;
+    		   d =c;
     		   //d = 0;
-        	   System.out.printf("Action : k");
+        	   System.out.printf("Action : k\n");
       	    break;
     	  case 'y':
     		  switch(this.d)
@@ -150,23 +150,23 @@ public class Robot {
     			  break;
     		  case '!' :
     			  moveRobot(Direction.NORTH);
-    			  System.out.printf("Action : y !");
+    			  System.out.printf("Action : y !\n");
         		  break;
     		  case '"' :
     			  moveRobot(Direction.WEST);
-    			  System.out.printf("Action : y " + '"');
+    			  System.out.printf("Action : y " + '"'+'\n');
         		  break;
     		  case '#' :
     			  moveRobot(Direction.SOUTH);
-    			  System.out.printf("Action : y #");
+    			  System.out.printf("Action : y #\n");
         		  break;
     		  case '$' :
     			 map.damageRobots(posX,posY);
-    			 System.out.printf("Action : y $");
+    			 System.out.printf("Action : y $\n");
         		  break;
     		  case '%' :
     			  map.rechargeRobots(posX, posY);
-    			  System.out.printf("Action : y %");
+    			  System.out.printf("Action : y %\n");
         		  break;
     		  case '&' :
     			  map.destroyWalls(posX, posY);
@@ -181,7 +181,7 @@ public class Robot {
     	  case 'i':
       	    x = pStack.unStack();
       	    y = pStack.unStack();
-      	  System.out.printf("Action : i");
+      	  System.out.printf("Action : i\n");
       	    break;
     	  default:
 
@@ -190,7 +190,6 @@ public class Robot {
     	    break;
     	}
     	c++;
-    	System.out.printf("\n%d",c);
 
     	
     }

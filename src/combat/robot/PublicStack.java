@@ -44,10 +44,10 @@ public class PublicStack {
 		int unstackedValue;
 		unstackedValue = this.stack[p];
 		this.p--;
-		if(this.p < 0)
+		if(p < 0)
 		{
 			unstackedValue = -1;
-			this.p = 0;
+			p = 0;
 		}
 		return unstackedValue;
 	}

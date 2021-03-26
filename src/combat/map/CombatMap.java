@@ -96,11 +96,6 @@ public class CombatMap {
                     "of the map you've given. Please consider verify the path file and the validity and correct access" +
                     " of the file." + e.getMessage());
         }
-        for (Robot rb : robots) {
-			
-			 System.out.printf("Robot : %s Vie : %d",rb.getName(),rb.getEnergy());
-        }
-		
     }
     /**
      * 
