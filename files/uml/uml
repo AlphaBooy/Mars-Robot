@@ -211,3 +211,27 @@ EquiperMateriel --> [*]
 
 }
 @enduml
+
+diagramme cas (part2)
+@startuml
+actor :robot:
+rectangle programme {
+robot -- (Instruction P)
+robot -- (Instruction G)
+robot -- (Instruction D)
+robot -- (Instruction M)
+robot -- (Instruction K)
+robot -- (Déplacer le robot)
+robot -- (Attaquer robot à proximité)
+robot -- (Soigner robot)
+robot -- (Détruire mur)
+
+"Instruction Y" as (Y)
+(Déplacer le robot) ..> (Y) : include
+(Attaquer robot à proximité) ..> (Y) : include
+(Soigner robot) ..> (Y) : include
+(Détruire mur) ..> (Y) : include
+
+}
+@enduml
+
