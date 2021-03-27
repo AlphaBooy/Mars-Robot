@@ -20,6 +20,7 @@ import combat.robot.*;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Display extends Application {
@@ -72,6 +73,38 @@ public class Display extends Application {
         }
     }
 
+
+    public static void makeActions() {
+        Runnable task = () -> {
+            ArrayList<Robot> rbs = map.getRobots();
+            int i = 0;
+            while (i <4) {
+                Platform.runLater(() -> {
+                        /* For each char in the map char representation : */
+                    try {
+                        Thread.sleep(1000);
+                        for (int x = 0; x < map.getSizeX(); x++) {
+                            for (int y = 0; y < map.getSizeY(); y++) {
+                                /* Add each images on the given x:y position in the pane */
+                                generateTexture(x,y);
+                            }
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                });
+                for(Robot rb : rbs){
+                    rb.executeCommand();
+                }
+                i++;
+            }
+        };
+        /* Start the new thread */
+        new Thread(task).start();
+    }
+
+
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Objectif Mars");
@@ -90,6 +123,10 @@ public class Display extends Application {
             }
         }
 
+        makeActions();
+
+
+
         BorderPane borderPane = new BorderPane(pane);
         /* Add the GridPane into the scene panel */
         Scene scene = new Scene(borderPane);
@@ -100,13 +137,6 @@ public class Display extends Application {
         /* Display the scene on the primary stage  */
         primaryStage.show();
 
-        CombatMap map = CombatMap.getInstance();
-/*        while(map.turn() != 's'){
-            try {
-                Thread.sleep(1000);
-            }catch(Exception e){
-                System.err.println(e);
-            }
-        };*/
+
     }
 }

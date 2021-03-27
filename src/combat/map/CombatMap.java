@@ -119,7 +119,11 @@ public class CombatMap {
 	 */
 	public char[][] getMap() {return map;}
 
-    /**
+	public ArrayList<Robot> getRobots() {
+		return robots;
+	}
+
+	/**
      * Display a 2D representation of the current map in the console, using characters
      */
     public void DisplayMap() {
@@ -305,10 +309,11 @@ public class CombatMap {
     }
     public char turn() {
 		char endFlag = 0;
-    	Scanner sc = new Scanner(System.in);
-    	char c = sc.next().charAt(0);
+    	/*Scanner sc = new Scanner(System.in);
+    	char c = sc.next().charAt(0);*/
+		int c = 0;
    
-    	if(c == 't')
+    	if(c < 10)
     	{
     		if(turnCount == MAX_TURN)
     		{
@@ -320,17 +325,15 @@ public class CombatMap {
 
     			 rb.executeCommand();
             }
-    		DisplayMap();
+    		//DisplayMap();
     		this.turnCount++;
     		}
+    		c++;
     	}
-    	if(c == 's')
+    	if(c > 10)
     	{
     	 endFlag = 's';
     	}
-    	
-    	
-    	
     	return endFlag;
     	
     }

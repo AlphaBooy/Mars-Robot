@@ -142,7 +142,7 @@ public class Robot {
         	   System.out.printf("Action : k\n");
       	    break;
     	  case 'y':
-    		  switch(this.d)
+    		  switch(' ')
     		  {
     		  case ' ' :
     			  moveRobot(Direction.EAST);
