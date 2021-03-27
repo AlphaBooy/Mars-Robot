@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Main extends Application {
 
 
+    public static final String MATERIAL_LIST = "files/material/material_list_1.txt";
     public static GridPane pane = new GridPane();
     public static GridPane infos = new GridPane();
     public static GridPane material = new GridPane();
@@ -136,7 +137,7 @@ public class Main extends Application {
             try {
                 while (i++ < robot.getActionDuration(action)) {
                     pi.setProgress(i / robot.getActionDuration(action));
-                        Thread.sleep(1000);
+                    Thread.sleep(1000);
                 }
             } catch (InterruptedException e) {
                 System.err.println("ERROR: You can't stop the program while the robot is performing tasks. Execution failed");
@@ -205,7 +206,7 @@ public class Main extends Application {
     public static void displayMaterial() {
         /* A list view that displays all configuration properties of the robot */
         ListView<String> listViewMaterial = new ListView<>();
-        Material.getAllMaterial("files/material/material_list_1.txt").forEach((materialElement) -> {
+        Material.getAllMaterial(MATERIAL_LIST).forEach((materialElement) -> {
             listViewMaterial.getItems().add(materialElement.getName());
         });
         material.add(listViewMaterial,0,0);

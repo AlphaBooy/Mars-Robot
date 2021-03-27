@@ -4,9 +4,11 @@ import map.Map;
 import map.MapObject;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Robot {
+    public static final String BEST_RUN = "files/results/best_run";
     private HashMap<String, Double> config;
     /** A direction that can be one of {NORTH , SOUTH, EAST, WEST} */
     private Direction direction;
@@ -408,7 +410,7 @@ public class Robot {
             return Integer.parseInt(fileContent);
         } catch (NumberFormatException formatException) {
             System.err.println("ERROR: Wrong number of run detected, replaced with default 'run_1'. Waiting for you to" +
-                    "patch this issue manually");
+                    " patch this issue manually");
             return 1;
         } catch (IOException e) {
             System.err.println("ERROR: Missing file, critical error !");
@@ -430,5 +432,39 @@ public class Robot {
         } catch (IOException e) {
             System.err.println("ERROR: Can't create the result file ! Make sure the program has access to the result repository.");
         }
+    }
+
+    public String[] getBestPath() {
+        boolean continuer= true;
+        ArrayList<String> path = new ArrayList<>();
+        int bestScore = 0;
+        File bestRun = new File(BEST_RUN);
+        /* Parse the score of the best run registered */
+        try (FileReader fr = new FileReader(bestRun)) {
+            int charRead;
+            String fileContent = "";
+            while ((charRead = fr.read()) != -1) {
+                fileContent += (char) charRead;
+            }
+            bestScore = Integer.parseInt(fileContent.split(",")[fileContent.split(",").length].split(" ")[1]);
+        } catch (IOException e) {
+            bestScore = 0;
+        }
+        while (continuer) { // Exit on game over
+
+        }
+        /* If the result is good enough, save the results in the "best result file" */
+        if (this.value > bestScore) {
+            try {
+                /* Create a BufferedWritter that'll write the given String at the end of the right result file */
+                BufferedWriter myWriter = new BufferedWriter(new FileWriter(bestRun, true));
+                myWriter.write((int) this.value);
+                myWriter.close();
+            } catch (IOException e) {
+                System.err.println("ERROR: Can't create the result file ! Make sure the program has access to the result repository.");
+                System.exit(1); // You can't proceed if the results can't be saved !
+            }
+        }
+        return null;
     }
 }
