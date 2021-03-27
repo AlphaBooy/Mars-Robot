@@ -43,11 +43,12 @@ public class PublicStack {
 	public int unStack() {
 		int unstackedValue;
 		unstackedValue = this.stack[p];
+		this.stack[p] = 0;
 		this.p--;
-		if(p < 0)
+		if(this.p < 0)
 		{
-			unstackedValue = -1;
-			p = 0;
+
+			this.p = 0;
 		}
 		return unstackedValue;
 	}

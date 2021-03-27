@@ -10,6 +10,7 @@ public class CombatMain {
 		CombatMap map = CombatMap.getInstance();
 		map.DisplayMap();
 		while(map.turn() != 's');
+		map.remainingBots();
 		
 		
 	}

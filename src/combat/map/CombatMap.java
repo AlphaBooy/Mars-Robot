@@ -1,8 +1,13 @@
+
 package combat.map;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -240,6 +245,41 @@ public class CombatMap {
     	}
     	robotToRecharge.addEnergy(energyToGive);
     }
+    
+
+    public void remainingBots()
+    {
+    	 File file = new File("files\\combat\\remaining");
+    	 file.delete();
+    	  try {
+
+    	    Path path = Paths.get("files\\combat\\remaining");
+
+    	    //java.nio.file.Files;
+    	    Files.createDirectories(path);
+
+
+    	  } catch (IOException e) {
+
+    	    System.err.println("Failed to create directory!" + e.getMessage());
+
+    	  }
+
+    	for (int i=0;i<robots.size();i++) {
+		Robot rb = robots.get(i);
+    	try {
+		      FileWriter myWriter = new FileWriter("files\\combat\\remaining\\" + rb.getName() + ".txt");
+		      myWriter.write(rb.getName() + ' '+ rb.getCLogAsString());
+		      myWriter.close();
+		      System.out.println("Successfully wrote to the file.");
+		    } catch (IOException e) {
+		      System.out.println("An error occurred.");
+		      e.printStackTrace();
+		    }
+    }
+    	
+    }
+ 
     /**
      * Destroy all walls on the adjacent positions and withdraw one energy
      * from the robot on the center for each wall found
