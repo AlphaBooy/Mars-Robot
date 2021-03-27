@@ -4,9 +4,11 @@ import map.Map;
 import map.MapObject;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Robot {
+    public static final String BEST_RUN = "files/results/best_run";
     private HashMap<String, Double> config;
     /** A direction that can be one of {NORTH , SOUTH, EAST, WEST} */
     private Direction direction;
@@ -23,6 +25,8 @@ public class Robot {
     /** The weight carried by the robot. If it's heavier than the max weight the robot can carried, it stop */
     private double weightCarried;
 
+    public static final String FILES_MATERIAL_MATERIAL_LIST_1_TXT = "files/material/material_list_1.txt";
+    public static final String FILES_RESULTS_CURRENT_NUMBER = "files/results/current_number.txt";
     public static final String PATH_TO_IMAGE = "textures/robot.png";
     public static final int ACCELERATION_FACTOR = 1;
 
@@ -151,6 +155,12 @@ public class Robot {
         } else if (this.getDirection() == Direction.NORTH) {
             posY--;
         }
+        /* If the robot leaves the map, you can't track it anymore, the game is over ! */
+        if (posX > map.getSizeX() || posX < 0 || posY > map.getSizeY() || posY < 0)
+            gameOver();
+        /* We unload the robot when we hit the base */
+        if (map.getObject(this.posX, this.posY).getName() == "base")
+            this.weightCarried = 0;
         /* CASE --> the robot evolve on a mined MapObject or on the base : the movement time is the minimum one */
         if (map.getObject(this.posX, this.posY).getName() == "void" || map.getObject(this.posX, this.posY).getName() == "base") {
             /* Use the necessary energy from the battery to move the robot forward. The robot'll stop if battery < 0 */
@@ -203,9 +213,11 @@ public class Robot {
                     }
                     break;
                 case "acheter": case "buy":
-                    buyMaterial(new Material(instruction.toLowerCase().split(" ")[1],"files/material/material_list_1.txt"));
+                    buyMaterial(new Material(instruction.toLowerCase().split(" ")[1],FILES_MATERIAL_MATERIAL_LIST_1_TXT));
                     writeInResult("ACHETER " + instruction.toUpperCase().split(" ")[1] + ",");
                     break;
+                default:
+                    gameOver();
             }
         }
     }
@@ -262,21 +274,41 @@ public class Robot {
             gameOver(); // If the robot is overload, end the game
     }
 
+    /**
+     * The game is over when :
+     *      - The robot run out of battery
+     *      - The robot carry to much weight and can't move anymore
+     *      - The robot leaves the map area and can't be tracked anymore
+     *      - If the robot want to perform an action that isn't understood (the robot explode)
+     *      - ...
+     * When the game is over, write the final score in the result file, update the current run number and exit the app.
+     */
     public void gameOver() {
         writeInResult("SCORE " + Double.toString(this.value));
         System.out.println("the game is over !");
         setCurrentNumber(); // Upgrade the run version number
+        System.exit(0);
     }
 
+    /**
+     * Write a result in a dedicated file.
+     * The results are composed of :
+     *      - All actions made by the robot separated by ','
+     *      - The total score made by the robot at the end of it's journey
+     * Results files are generated with a unique id and all results are append at the end of the file.
+     * @param resultToWrite The String that'll be written at the end of the result file.
+     */
     private void writeInResult(String resultToWrite) {
         String path = "files/results/run_" + getCurrentRunNumber();
         File resultFile = new File(path);
         try {
+            /* Create a BufferedWritter that'll write the given String at the end of the right result file */
             BufferedWriter myWriter = new BufferedWriter(new FileWriter(resultFile, true));
             myWriter.write(resultToWrite);
             myWriter.close();
         } catch (IOException e) {
             System.err.println("ERROR: Can't create the result file ! Make sure the program has access to the result repository.");
+            System.exit(1); // You can't proceed if the results can't be saved !
         }
     }
 
@@ -295,52 +327,91 @@ public class Robot {
                 '}';
     }
 
+    /**
+     * @param action The action you want the total duration time
+     * @return The duration of the action given in argument
+     */
     public double getActionDuration(String action) {
-        switch (action.toLowerCase()) {
+        switch (action.toLowerCase().split(" ")[0]) {
             case "move": case "avancer":
+                /* If the robot evolve on a broken map object or on the base */
                 if (map.getObject(this.posX, this.posY).getName() == "void" || map.getObject(this.posX, this.posY).getName() == "base") {
                     return (this.config.get("temps_deplacement_vide")) / ACCELERATION_FACTOR;
                 }
+                /* If the robot need to mine the map element to progress on the map */
                 MapObject mo = map.getObject(this.posX, this.posY);
                 return ((mo.getAttribute("hardness") * 100) / this.laser.getPower()) / ACCELERATION_FACTOR;
-            case "rotate south": case "tourner sud":
-            case "rotate east": case "tourner est":
-            case "rotate west": case "tourner ouest":
-            case "rotate north": case "tourner nord":
+            case "rotate": case "tourner":
                 return this.config.get("temps_rotation") / ACCELERATION_FACTOR;
+            case "acheter": case "buy":
+                return this.getConfig().get("temps_installation") * 1000 / ACCELERATION_FACTOR;
         }
         return 0;
     }
 
+    /**
+     * The robot need to buy material to mine more objects and get an higher score. To do so, the robot need :
+     *      - to be on the base (where it's material is stored and can be bought + equipped)
+     *      - to have enough value to buy the desired material
+     * Then, the robot will buy instantly the material from the base deducing it's price to the value pool and set up
+     * the new equipment with a constant installation time taken from the configuration file.
+     * @param material The material that will be bought and equipped
+     */
     public void buyMaterial(Material material) {
-        if (this.value > material.getCost()) {
+        if (this.value > material.getCost() && this.posX == map.getBase().getPosX() && this.posY == map.getBase().getPosY()) {
             this.value -= material.getCost();
+            /* Generate the material if it's a laser */
             if (Material.isLaser(material.getName()))
-                this.laser = new Laser(material.getName(), material.getValue("files/material/material_list_1.txt", material.getName()));
+                this.laser = new Laser(material.getName(), material.getValue(FILES_MATERIAL_MATERIAL_LIST_1_TXT, material.getName()));
+            /* Generate the material if it's a battery */
+            if (Material.isBattery(material.getName()))
+                this.battery = new Battery(material.getName(), material.getValue(FILES_MATERIAL_MATERIAL_LIST_1_TXT, material.getName()));
+            try {
+                /* Wait for the robot to equip the material */
+                Thread.sleep((long) (this.getConfig().get("temps_installation") * 1000) / ACCELERATION_FACTOR);
+            } catch (InterruptedException e) {
+                System.err.println("ERROR: You tried to stop (or change) the program while the robot was equipping an item." +
+                        "The program will stop immediately to avoid any further issues.");
+                System.exit(1);
+            }
         }
     }
 
+    /**
+     * Start the game by creating a new result file where all results will be stored during the game.
+     * If the run number has already been saved by another run, overwrite it to avoid further issues.
+     */
     public static void startGame() {
         String path = "files/results/run_" + getCurrentRunNumber();
         File resultFile = new File(path);
         try {
+            /* OverWrite the result file (or just initiate it if it didn't exists before */
             FileWriter myWriter = new FileWriter(resultFile);
-            myWriter.write(" ");
+            myWriter.write("");
             myWriter.close();
         } catch (IOException e) {
             System.err.println("ERROR: Can't create the result file ! Make sure the program has access to the result repository.");
+            System.exit(1);  // We can't proceed if no result are saved in the result file !
         }
     }
 
+    /**
+     * @return the current run number to name the result file and don't overwrite previous runs, number are stored in a dedicated file.
+     */
     private static int getCurrentRunNumber() {
-        File file = new File("files/results/current_number.txt");
+        File file = new File(FILES_RESULTS_CURRENT_NUMBER);
         try (FileReader fr = new FileReader(file)) {
             int charRead;
             String fileContent = "";
             while ((charRead = fr.read()) != -1) {
                 fileContent += (char) charRead;
             }
+
             return Integer.parseInt(fileContent);
+        } catch (NumberFormatException formatException) {
+            System.err.println("ERROR: Wrong number of run detected, replaced with default 'run_1'. Waiting for you to" +
+                    " patch this issue manually");
+            return 1;
         } catch (IOException e) {
             System.err.println("ERROR: Missing file, critical error !");
             System.exit(1);
@@ -348,8 +419,11 @@ public class Robot {
         return 1; // DEFAULT
     }
 
+    /**
+     * Set the run number to *current run number + 1*
+     */
     private static void setCurrentNumber() {
-        String path = "files/results/current_number.txt";
+        String path = FILES_RESULTS_CURRENT_NUMBER;
         File savedCurrentRunNumberFile = new File(path);
         try {
             BufferedWriter myWriter = new BufferedWriter(new FileWriter(savedCurrentRunNumberFile));
@@ -358,5 +432,39 @@ public class Robot {
         } catch (IOException e) {
             System.err.println("ERROR: Can't create the result file ! Make sure the program has access to the result repository.");
         }
+    }
+
+    public String[] getBestPath() {
+        boolean continuer= true;
+        ArrayList<String> path = new ArrayList<>();
+        int bestScore = 0;
+        File bestRun = new File(BEST_RUN);
+        /* Parse the score of the best run registered */
+        try (FileReader fr = new FileReader(bestRun)) {
+            int charRead;
+            String fileContent = "";
+            while ((charRead = fr.read()) != -1) {
+                fileContent += (char) charRead;
+            }
+            bestScore = Integer.parseInt(fileContent.split(",")[fileContent.split(",").length].split(" ")[1]);
+        } catch (IOException e) {
+            bestScore = 0;
+        }
+        while (continuer) { // Exit on game over
+
+        }
+        /* If the result is good enough, save the results in the "best result file" */
+        if (this.value > bestScore) {
+            try {
+                /* Create a BufferedWritter that'll write the given String at the end of the right result file */
+                BufferedWriter myWriter = new BufferedWriter(new FileWriter(bestRun, true));
+                myWriter.write((int) this.value);
+                myWriter.close();
+            } catch (IOException e) {
+                System.err.println("ERROR: Can't create the result file ! Make sure the program has access to the result repository.");
+                System.exit(1); // You can't proceed if the results can't be saved !
+            }
+        }
+        return null;
     }
 }
