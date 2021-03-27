@@ -21,6 +21,9 @@ import combat.robot.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Display extends Application {
@@ -33,8 +36,9 @@ public class Display extends Application {
     public static CombatMap map = CombatMap.getInstance();
     public static int block_size = 25;
 
-    public static int STAGE_HEIGHT = 800;
-    public static int STAGE_WIDTH = 800;
+    public static int STAGE_HEIGHT = 800; //The height of the window
+    public static int STAGE_WIDTH = 800; //The width of the window
+    public static int WAIT_BETWEEN_ACTIONS = 500; //The amount of time in milliseconds waited between every actions
 
     /**
      * Display a texture depending of the name of the map object found in the map matrix.
@@ -45,23 +49,8 @@ public class Display extends Application {
      */
     public static void generateTexture(int x, int y) {
         try {
-            String charTexture = "";
-            switch (map.getChar(x,y)){
-                case '@':
-                    charTexture = "robot";
-                    break;
-                case ' ':
-                    charTexture = "empty";
-                    break;
-                case '#':
-                    charTexture = "wall";
-                    break;
-                case '%':
-                    charTexture = "battery";
-
-            }
             /* Create an image with the given texture for each position of each representations */
-            Image image = new Image(new FileInputStream("textures/combat/" + charTexture + ".png"));
+            Image image = new Image(new FileInputStream(getPathFromPos(x,y)));
             ImageView iv = new ImageView(image);
             /* Set the size of each parcel to it feet a good looking view. */
             iv.setFitHeight(block_size);
@@ -73,29 +62,66 @@ public class Display extends Application {
         }
     }
 
+    /**
+     * Give the path to the resource file corresponding to the given coordinate depending on the character and
+     * the battery in the case where the char is a robot
+     * @param x posX
+     * @param y poY
+     * @return a path to the resource file
+     */
+    private static String getPathFromPos(int x, int y){
+        String fileName = "";
+        switch (map.getChar(x,y)){
+            case '@':
+                fileName = "robot";
+                break;
+            case ' ':
+                fileName = "empty";
+                break;
+            case '#':
+                fileName = "wall";
+                break;
+            case '%':
+                fileName = "battery";
+        }
+        if(fileName == "robot"){
+            try {
+                fileName += map.getRobot(x,y).getEnergy();
+            }catch(IsNotARobotException e){
+                System.err.println("Error : A robot was expected " + e);
+            }
+        }
+        return "textures/combat/" + fileName + ".png";
+    }
+
 
     public static void makeActions() {
         Runnable task = () -> {
             ArrayList<Robot> rbs = map.getRobots();
             int i = 0;
-            while (i <4) {
+            while (i < (map).getLongestCommand()) {
+/*                //The following code is run after the action is performed and update the Graphical Interface
                 Platform.runLater(() -> {
-                        /* For each char in the map char representation : */
-                    try {
-                        Thread.sleep(1000);
-                        for (int x = 0; x < map.getSizeX(); x++) {
-                            for (int y = 0; y < map.getSizeY(); y++) {
-                                /* Add each images on the given x:y position in the pane */
-                                generateTexture(x,y);
-                            }
+                    for (int x = 0; x < map.getSizeX(); x++) {
+                        for (int y = 0; y < map.getSizeY(); y++) {
+                            *//* Add each images on the given x:y position in the pane *//*
+                            generateTexture(x,y);
                         }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
-
-                });
-                for(Robot rb : rbs){
-                    rb.executeCommand();
+                });*/
+                //Actually execute the commands of all the robots
+                synchronized (rbs) {
+                    Iterator iterator = rbs.iterator(); // Must be in synchronized block
+                    while (iterator.hasNext()){
+                        Robot rb = (Robot) iterator.next();
+                        rb.executeCommand();
+                    }
+                }
+                //We wait for a certain amount of time before performing another action
+                try {
+                    Thread.sleep(WAIT_BETWEEN_ACTIONS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
                 i++;
             }
@@ -104,16 +130,37 @@ public class Display extends Application {
         new Thread(task).start();
     }
 
+    /**
+     * Update in a dedicated thread a single element of the UI grid
+     * @param x
+     * @param y
+     */
+    public static void updateElement(int x, int y){
+        Runnable task = () -> {
+            //The following code is run after the action is performed and update the Graphical Interface
+            Platform.runLater(() -> {
+                generateTexture(x,y);
+            });
+        };
+        /* Start the new thread */
+        new Thread(task).start();
+    }
+
+
+
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Objectif Mars");
+        primaryStage.setTitle("Combat de Robots");
         char[][] charMap = map.getMap();
         /* Create a Map with the default map representation file */
         int sizeX = map.getSizeX();
         int sizeY = map.getSizeY();
 
-        this.block_size = STAGE_HEIGHT / sizeY;
+        if(STAGE_HEIGHT / sizeY < STAGE_WIDTH / sizeX)
+            this.block_size = STAGE_HEIGHT / sizeY;
+        else
+            this.block_size = STAGE_WIDTH / sizeX;
 
         /* For each char in the map char representation : */
         for (int x = 0; x < sizeX; x++) {
@@ -123,6 +170,7 @@ public class Display extends Application {
             }
         }
 
+        //Run the thread that will perform actions and update the GUI
         makeActions();
 
 

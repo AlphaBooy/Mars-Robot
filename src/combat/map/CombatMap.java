@@ -156,6 +156,7 @@ public class CombatMap {
      */
     public void setChar(int x, int y, char c) {
     	map[x][y] = c;
+    	Display.updateElement(x,y);
     }
     
 
@@ -297,7 +298,7 @@ public class CombatMap {
      * @return The corresponding robot
      * @throws IsNotARobotException if there are no robots with the given coordinates
      */
-    private Robot getRobot(int x, int y) throws IsNotARobotException {
+    public Robot getRobot(int x, int y) throws IsNotARobotException {
     	Robot rb = null;
     	for(int i = 0; i < robots.size(); i++) {
     		if(robots.get(i).getPosX() == x && robots.get(i).getPosY() == y)
@@ -337,6 +338,19 @@ public class CombatMap {
     	return endFlag;
     	
     }
+
+	/***
+	 *
+	 * @return the longest set of command from all the robots
+	 */
+	public int getLongestCommand(){
+		int res = 0;
+		for(Robot rb : robots){
+			if(rb.getCommandTotal() > res)
+				res = rb.getCommandTotal();
+		}
+		return res;
+	}
     
 
 }

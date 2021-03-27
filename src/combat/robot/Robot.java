@@ -50,10 +50,16 @@ public class Robot {
     public int getPosY() {
         return posY;
     }
-    
-   
-    public int getCommand() {
-    	return commandLog[this.c];
+
+	/**
+	 * Get the next command for the robot
+	 * @return if the commandLog isn't ended return it, else return -1
+	 */
+	public int getCommand() {
+    	int res = -1;
+    	if(this.c < commandLog.length)
+    		res = commandLog[this.c];
+    	return res;
  
     }
     public int getData()
@@ -71,6 +77,14 @@ public class Robot {
     public int getEnergy() {
     	return energy;
     }
+
+	/**
+	 * Get the total number of commands on this robot
+	 * @return length of commandLog
+	 */
+	public int getCommandTotal(){
+		return commandLog.length;
+	}
     public  void initBot(String name) {
     	File robotFile= new File("files\\combat\\bots\\" + name + ".txt");
     		
@@ -110,11 +124,12 @@ public class Robot {
     	PublicStack pStack = PublicStack.getInstance();
     	switch(getCommand()) {
     	  case 'p':
-    		  pStack.stack(this.d);
-    		  System.out.printf("Action : p\n");
-    	    break;
+    	  	pStack.stack(this.d);
+    	  	System.out.printf("Action : p\n");
+    	  	break;
     	  case 'g':
-    	    y = pStack.unStack();
+
+    	  	y = pStack.unStack();
     	    
     	    x = pStack.unStack();
     	    
@@ -130,16 +145,16 @@ public class Robot {
     	    
     	  case 'd':
       	    this.d = pStack.unStack();
-      	  System.out.printf("Action : d\n");
-      	  break;
+      	  	System.out.printf("Action : d\n");
+      	  	break;
     	  case 'm':
-      	   this.d = pStack.unStack();
-      	 System.out.printf("Action : m\n");
-      	   break;
+    	  	this.d = pStack.unStack();
+      	 	System.out.printf("Action : m\n");
+      	   	break;
     	  case 'k':
-    		   d =c;
-    		   //d = 0;
-        	   System.out.printf("Action : k\n");
+    	  	d =c;
+    	  	//d = 0;
+			  System.out.printf("Action : k\n");
       	    break;
     	  case 'y':
     		  switch(' ')
@@ -172,7 +187,7 @@ public class Robot {
     			  map.destroyWalls(posX, posY);
     			  System.out.printf("Action : y &\n");
         		  break;
-        	default :
+        		  default :
         		System.out.println("Y with wrong d : " + (char)this.d + "|" + this.d);
     		  }
     		  
@@ -181,12 +196,13 @@ public class Robot {
     	  case 'i':
       	    x = pStack.unStack();
       	    y = pStack.unStack();
-      	  System.out.printf("Action : i\n");
+      	  	System.out.printf("Action : i\n");
       	    break;
+			case -1:
+				System.out.println("The robot is out of commands !");
+				break;
     	  default:
-
     	    map.destroyRobot(posX, posY);
-
     	    break;
     	}
     	c++;
@@ -228,15 +244,13 @@ public class Robot {
 	 * Add a certain amount of energy, can be negative but cannot go over 10 and on 0 or below the robot is destroyed
 	 */
 	public void addEnergy(int value) {
-		CombatMap map = CombatMap.getInstance();
 		this.energy += value;
 		if(this.energy > 10)
 			this.energy = 10;
-
-		else if(this.energy <= 0);
-
-		else if(this.energy <= 0)
+		else if(this.energy <= 0){
+			CombatMap map = CombatMap.getInstance();
 			map.destroyRobot(posX, posY);
+		}
 }
 
 	
