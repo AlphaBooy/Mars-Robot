@@ -99,5 +99,14 @@ public class Display extends Application {
         primaryStage.setHeight(STAGE_HEIGHT);
         /* Display the scene on the primary stage  */
         primaryStage.show();
+
+        CombatMap map = CombatMap.getInstance();
+/*        while(map.turn() != 's'){
+            try {
+                Thread.sleep(1000);
+            }catch(Exception e){
+                System.err.println(e);
+            }
+        };*/
     }
 }

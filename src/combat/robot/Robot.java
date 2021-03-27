@@ -146,7 +146,7 @@ public class Robot {
     		  {
     		  case ' ' :
     			  moveRobot(Direction.EAST);
-    			  System.out.printf("Action : y  ");
+    			  System.out.println("Action : y  ");
     			  break;
     		  case '!' :
     			  moveRobot(Direction.NORTH);
@@ -173,7 +173,7 @@ public class Robot {
     			  System.out.printf("Action : y &\n");
         		  break;
         	default :
-        		System.out.printf("Bruh moment \n");
+        		System.out.println("Y with wrong d : " + (char)this.d + "|" + this.d);
     		  }
     		  
       	    break;

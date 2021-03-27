@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import combat.Display;
 import combat.robot.Robot;
 
 
@@ -131,6 +132,15 @@ public class CombatMap {
             System.out.println();
         }
     }
+
+    public void showMap(){
+		for (int i = 0; i < sizeX; i++) {
+			for (int j = 0; j < sizeY; j++) {
+				Display.generateTexture(i,j);
+			}
+		}
+	}
+
     /*
      * return the char at the given coordinates in the matrix
      */
@@ -182,7 +192,7 @@ public class CombatMap {
      */
     public void damageRobots(int x, int y) {
     	for(int i = x - 1; i <= x + 1; i++) {
-    		for(int j = y - 1; j <= y + 1; y++) {
+    		for(int j = y - 1; j <= y + 1; j++) {
     			if(isPosValid(i,j) && getChar(i,j) == '@') {
     				try {
     					Robot rb = getRobot(i,j);
@@ -209,7 +219,7 @@ public class CombatMap {
 			System.err.println("ERROR: The position for energy restituion isn't a robot : " + e.getMessage());
 		}
     	for(int i = x - 1; i <= x + 1; i++) {
-    		for(int j = y - 1; j <= y + 1; y++) {
+    		for(int j = y - 1; j <= y + 1; j++) {
     			if(isPosValid(i,j) && getChar(i,j) == '@') {//For all robots on the 9 positions
     				energyToGive += 1;
     				if(!(x == i && y == j)) {//If the position isn't the robot calling this method
@@ -240,7 +250,7 @@ public class CombatMap {
 			System.err.println("ERROR: The position for wall breaking isn't a robot : " + e.getMessage());
 		}
     	for(int i = x - 1; i <= x + 1; i++) {
-    		for(int j = y - 1; j <= y + 1; y++) {
+    		for(int j = y - 1; j <= y + 1; j++) {
     			if(isPosValid(i,j) && getChar(i,j) == '#') {//For all robots on the 9 positions
     				setChar(i,j,' ');
     				nbWalls += 1;
@@ -253,9 +263,8 @@ public class CombatMap {
      * Destroy the given robot and remove it from the map, it is replaced by a battery
      */
 	public void destroyRobot(int x, int y) {
-    	Robot robotToDestroy = null;
 		try {
-			robotToDestroy = getRobot(x,y);
+			Robot robotToDestroy = getRobot(x,y);
 			robots.remove(robotToDestroy);
 			setChar(x, y, '%');
 		}catch(IsNotARobotException e) {
@@ -295,9 +304,9 @@ public class CombatMap {
     	return rb;
     }
     public char turn() {
-    	Scanner sc = new Scanner(System.in);   
-    	char c = sc.next().charAt(0);   
-    	char endFlag = 0;
+		char endFlag = 0;
+    	Scanner sc = new Scanner(System.in);
+    	char c = sc.next().charAt(0);
    
     	if(c == 't')
     	{

@@ -8,7 +8,7 @@ public class CombatMain {
 		PublicStack PS = PublicStack.getInstance();
 
 		CombatMap map = CombatMap.getInstance();
-		map.DisplayMap();   
+		map.DisplayMap();
 		while(map.turn() != 's');
 		
 		
