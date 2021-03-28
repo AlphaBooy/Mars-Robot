@@ -106,6 +106,10 @@ public class Battery {
         return capacity;
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     public String toString() {
         return "Battery{" +

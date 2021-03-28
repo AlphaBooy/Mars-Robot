@@ -108,16 +108,22 @@ public class Material {
         return "[Object: " + object.toString() + "; Cost: " + cost + "]";
     }
 
-    public double getValue(String path, String name) {
+    public static int getMAterialAtribute(String path, String name, String attribute) {
+        int indexAttribute = 0;
+        if (attribute == "cost" || attribute == "cout")
+            indexAttribute = 2;
+        if (attribute == "value" || attribute == "valeur")
+            indexAttribute = 1;
         String lineContent = "";
-        double value;
         File file = new File(path);
         try (FileReader fr = new FileReader(file)) {
             int charRead;
             while ((charRead = fr.read()) != -1) {
                 if (charRead == '\n') {
-                    if (lineContent.split(" ")[0] == name)
-                        return Double.parseDouble(lineContent.split(" ")[2]);
+                    if (lineContent.split(" ")[0].equals(name))
+                        return Integer.parseInt(lineContent.split(" ")[lineContent.split(" ").length - indexAttribute]);
+                    lineContent = "";
+                    continue;
                 }
                 lineContent += (char) charRead;
             }

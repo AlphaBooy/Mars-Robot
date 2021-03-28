@@ -29,6 +29,24 @@ public class Robot {
     public static final String FILES_RESULTS_CURRENT_NUMBER = "files/results/current_number.txt";
     public static final String PATH_TO_IMAGE = "textures/robot.png";
     public static final int ACCELERATION_FACTOR = 1;
+    private static final String CHEMINCONFIG = "files/robot/config_1.txt";
+
+    /**
+     * Generate the default robot object.
+     * It'll be creating facing north, with a default laser and a default battery.
+     * The default position of the robot is on the base position of the default map
+     */
+    public Robot() {
+        this.battery = (Battery) Material.getDefault()[0].getObject();
+        this.laser = (Laser) Material.getDefault()[1].getObject();
+        this.direction = Direction.NORTH;
+        this.map = new Map();
+        this.posX = map.getBase().getPosX();
+        this.posY = map.getBase().getPosY();
+        this.value = 0;
+        this.weightCarried = 0;
+        this.config = getConfig(CHEMINCONFIG);
+    }
 
     /**
      * Generate the default robot object.
@@ -213,7 +231,7 @@ public class Robot {
                     }
                     break;
                 case "acheter": case "buy":
-                    buyMaterial(new Material(instruction.toLowerCase().split(" ")[1],FILES_MATERIAL_MATERIAL_LIST_1_TXT));
+                    buyMaterial(instruction.toLowerCase().split(" ")[1]);
                     writeInResult("ACHETER " + instruction.toUpperCase().split(" ")[1] + ",");
                     break;
                 default:
@@ -355,20 +373,22 @@ public class Robot {
      *      - to have enough value to buy the desired material
      * Then, the robot will buy instantly the material from the base deducing it's price to the value pool and set up
      * the new equipment with a constant installation time taken from the configuration file.
-     * @param material The material that will be bought and equipped
+     * @param materialName The name of the material that will be bought and equipped
      */
-    public void buyMaterial(Material material) {
-        if (this.value > material.getCost() && this.posX == map.getBase().getPosX() && this.posY == map.getBase().getPosY()) {
-            this.value -= material.getCost();
+    public void buyMaterial(String materialName) {
+        /* If the robot can buy the material, buy it, equip it and the cost of the material is deduced from the robot value */
+        if (this.value > Material.getMAterialAtribute(FILES_MATERIAL_MATERIAL_LIST_1_TXT, materialName, "cost")
+                && this.posX == map.getBase().getPosX() && this.posY == map.getBase().getPosY()) {
+            this.value -= Material.getMAterialAtribute(FILES_MATERIAL_MATERIAL_LIST_1_TXT, materialName, "cost");
             /* Generate the material if it's a laser */
-            if (Material.isLaser(material.getName()))
-                this.laser = new Laser(material.getName(), material.getValue(FILES_MATERIAL_MATERIAL_LIST_1_TXT, material.getName()));
+            if (Material.isLaser(materialName))
+                this.laser = new Laser(materialName, Material.getMAterialAtribute(FILES_MATERIAL_MATERIAL_LIST_1_TXT, materialName, "value"));
             /* Generate the material if it's a battery */
-            if (Material.isBattery(material.getName()))
-                this.battery = new Battery(material.getName(), material.getValue(FILES_MATERIAL_MATERIAL_LIST_1_TXT, material.getName()));
+            if (Material.isBattery(materialName))
+                this.battery = new Battery(materialName, Material.getMAterialAtribute(FILES_MATERIAL_MATERIAL_LIST_1_TXT, materialName, "value"));
             try {
                 /* Wait for the robot to equip the material */
-                Thread.sleep((long) (this.getConfig().get("temps_installation") * 1000) / ACCELERATION_FACTOR);
+                Thread.sleep((long) (this.getConfig().get("temps_installation") / ACCELERATION_FACTOR));
             } catch (InterruptedException e) {
                 System.err.println("ERROR: You tried to stop (or change) the program while the robot was equipping an item." +
                         "The program will stop immediately to avoid any further issues.");
