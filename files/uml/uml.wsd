@@ -164,7 +164,7 @@ state bougerRobot {
         mine --> [*]
     }
     miner -> [*] : [charge robot > charge max]
-    miner --> [*] : [batterie <= 0]
+    miner --> robotDetruit : [batterie <= 0]
 }
 @enduml
 
@@ -376,3 +376,18 @@ else "Instruction inconnue"
     robot -> robot : Déstruction
 end 
 @enduml
+
+
+
+//TODO
+diagram sequence partie1
+    ajouter les barres 
+diagram cas partie 1 
+    le robot peut pas miner directement 
+    revoie au niveau de l'achat/installation des équipements
+diagram etat transution acheter equipement 
+    revoir l'ordre des états avec le code 
+diagram sequence partie 2 
+    ajouter les barres
+diagram classe partie 2 
+    A FAIRE 
