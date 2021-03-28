@@ -36,17 +36,6 @@ public class Map {
     }
 
     /**
-     * Creates a empty map with a given size (in X and Y)
-     * Objects can be added later on by using AddObject method
-     * @param sizeX Width of the map that will be created
-     * @param sizeY Height of the map that will be created
-     */
-    public Map(int sizeX, int sizeY) {
-        this.sizeX = sizeX;
-        this.sizeY = sizeY;
-    }
-
-    /**
      * Create a map with the default file representation "zone_1.txt".
      * This map is set up with a given Size (SizeX = 40; SizeY = 20)
      * All objects are generated and ready to use. It can be a great method to test or to backup if needed.

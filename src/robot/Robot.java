@@ -426,7 +426,6 @@ public class Robot {
             while ((charRead = fr.read()) != -1) {
                 fileContent += (char) charRead;
             }
-
             return Integer.parseInt(fileContent);
         } catch (NumberFormatException formatException) {
             System.err.println("ERROR: Wrong number of run detected, replaced with default 'run_1'. Waiting for you to" +
@@ -447,7 +446,7 @@ public class Robot {
         File savedCurrentRunNumberFile = new File(path);
         try {
             BufferedWriter myWriter = new BufferedWriter(new FileWriter(savedCurrentRunNumberFile));
-            myWriter.write((char) (getCurrentRunNumber() + 1));
+            myWriter.write((getCurrentRunNumber() + 1));
             myWriter.close();
         } catch (IOException e) {
             System.err.println("ERROR: Can't create the result file ! Make sure the program has access to the result repository.");
@@ -456,35 +455,117 @@ public class Robot {
 
     public String[] getBestPath() {
         boolean continuer= true;
-        ArrayList<String> path = new ArrayList<>();
-        int bestScore = 0;
-        File bestRun = new File(BEST_RUN);
-        /* Parse the score of the best run registered */
-        try (FileReader fr = new FileReader(bestRun)) {
-            int charRead;
-            String fileContent = "";
-            while ((charRead = fr.read()) != -1) {
-                fileContent += (char) charRead;
+        int posX = map.getBase().getPosX();
+        int posY = map.getBase().getPosY();
+        /* Build the list of all vertexes (all possible positions on the map) */
+        ArrayList<String> vertexes = new ArrayList<>();
+        for (int i = 0; i < map.getSizeY(); i++) {
+            for (int j = 0; j < map.getSizeX(); j++) {
+                vertexes.add(i+":"+j);
             }
-            bestScore = Integer.parseInt(fileContent.split(",")[fileContent.split(",").length].split(" ")[1]);
-        } catch (IOException e) {
-            bestScore = 0;
         }
-        while (continuer) { // Exit on game over
+
+        ArrayList<ArrayList<HashMap<Integer, String>>> allLines = new ArrayList<>();
+        ArrayList<HashMap<Integer, String>> firstLine = new ArrayList<>();
+        HashMap<Integer, String> lineElement = new HashMap<>();
+
+        /* Initiate manually the line with null on all the position not reached by the robot */
+        for (int i = 0; i < map.getSizeX() * map.getSizeY(); i++) {
+            firstLine.add(null);
+        }
+
+        /* Add 0 to value and "" to the list of actions for the position of the base (initialisation) */
+        lineElement.put(0,"");
+        firstLine.set(posX * posY + posX, lineElement);
+
+        /* Add the first line of initialisation within the array of all lines */
+        allLines.add(0, firstLine);
+
+        /* An array with all illegal positions for the Dijkstra algorithm (where the robot came from) */
+        ArrayList<Integer> illegalIndexes = new ArrayList<>();
+        illegalIndexes.add(posX * posY + posX);
+
+        /* The maximum value on a line */
+        int max = 0;
+        int index = 0;
+        while (index++ < 8) { // Exit on game over
+            /* Calculate all positions that can be reached by the robot */
+            int[] position_south = {posX, posY + 1};
+            int[] position_north = {posX, posY - 1};
+            int[] position_east = {posX + 1, posY};
+            int[] position_west = {posX - 1, posY};
+            /* Calculate position in the line (index) from the X and Y position */
+            int index_south = (position_south[0] * position_south[1]) + position_south[0];
+            int index_north = (position_north[0] * position_north[1]) + position_north[0];
+            int index_east = (position_east[0] * position_east[1]) + position_east[0];
+            int index_west = (position_west[0] * position_west[1]) + position_west[0];
+            /* Each map object has a value for the algorithm : The hardness and weight is a penalty but the value is a bonus */
+
+            ArrayList<HashMap<Integer, String>> line = new ArrayList<>();
+
+            /* Initiate manually the line with null on all the position not reached by the robot */
+            for (int i = 0; i < map.getSizeX() * map.getSizeY(); i++) {
+                line.add(null);
+            }
+
+            if (!illegalIndexes.contains(index_south)) {
+                MapObject mo_south = map.getObject(position_south[0], position_south[1]);
+                HashMap<Integer, String> lineElement_south = new HashMap<>();
+                int value_south = max + mo_south.getAttribute("value") - (mo_south.getAttribute("hardness") * 5) - mo_south.getAttribute("weight");
+                lineElement_south.put(value_south, position_south[0] + ":" + position_south[1]);
+                line.set(index_south, lineElement_south);
+                illegalIndexes.add(index_south);
+            }
+            if (!illegalIndexes.contains(index_north)) {
+                MapObject mo_north = map.getObject(position_north[0], position_north[1]);
+                HashMap<Integer, String> lineElement_north = new HashMap<>();
+                int value_north = max + mo_north.getAttribute("value") - (mo_north.getAttribute("hardness") * 5) - mo_north.getAttribute("weight");
+                lineElement_north.put(value_north, position_north[0] + ":" + position_north[1]);
+                line.set(index_north, lineElement_north);
+                illegalIndexes.add(index_north);
+            }
+            if (!illegalIndexes.contains(index_east)) {
+                MapObject mo_east = map.getObject(position_east[0], position_east[1]);
+                HashMap<Integer, String> lineElement_east = new HashMap<>();
+                int value_east = max + mo_east.getAttribute("value") - (mo_east.getAttribute("hardness") * 5) - mo_east.getAttribute("weight");
+                lineElement_east.put(value_east, position_east[0] + ":" + position_east[1]);
+                line.set(index_east, lineElement_east);
+                illegalIndexes.add(index_east);
+            }
+            if (!illegalIndexes.contains(index_west)) {
+                MapObject mo_west = map.getObject(position_west[0], position_west[1]);
+                HashMap<Integer, String> lineElement_west = new HashMap<>();
+                int value_west = max + mo_west.getAttribute("value") - (mo_west.getAttribute("hardness") * 5) - mo_west.getAttribute("weight");
+                lineElement_west.put(value_west, position_west[0] + ":" + position_west[1]);
+                line.set(index_west, lineElement_west);
+                illegalIndexes.add(index_west);
+            }
+
+            for (int i = 0; i < line.size(); i++) {
+                if (line.get(i) == null) continue;
+                for (int key : line.get(i).keySet()) {
+                    if (max <= key && !illegalIndexes.contains(Integer.parseInt(line.get(i).get(key).split(":")[0]) *
+                                                                Integer.parseInt(line.get(i).get(key).split(":")[1]) +
+                                                                Integer.parseInt(line.get(i).get(key).split(":")[0]))) {
+                        max = key;
+                        posX = Integer.parseInt(line.get(i).get(key).split(":")[0]);
+                        posY = Integer.parseInt(line.get(i).get(key).split(":")[1]);
+                    }
+                }
+            }
+
+            allLines.add(line);
+            System.out.println(vertexes.toString());
+            allLines.forEach((lines) -> {
+                System.out.println(lines.toString());
+            });
 
         }
-        /* If the result is good enough, save the results in the "best result file" */
-        if (this.value > bestScore) {
-            try {
-                /* Create a BufferedWritter that'll write the given String at the end of the right result file */
-                BufferedWriter myWriter = new BufferedWriter(new FileWriter(bestRun, true));
-                myWriter.write((int) this.value);
-                myWriter.close();
-            } catch (IOException e) {
-                System.err.println("ERROR: Can't create the result file ! Make sure the program has access to the result repository.");
-                System.exit(1); // You can't proceed if the results can't be saved !
-            }
-        }
         return null;
+    }
+
+    public static void main(String[] args) {
+        Robot robot = new Robot();
+        robot.getBestPath();
     }
 }

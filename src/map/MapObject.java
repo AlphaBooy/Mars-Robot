@@ -105,16 +105,15 @@ public class MapObject {
                 throw new IllegalStateException("Unexpected value: " + element);
         }
         /* Get the measure file and read it to parse it */
-        String [] fileContent = readMapObjectsFile(FILES_MEASURES);
+        String[] fileContent = readMapObjectsFile(FILES_MEASURES);
         /* Reading each lines of the file */
         for (int i = 0; i < fileContent.length; i++) {
-            String[] fileContentSplit = fileContent[i].split(" ");
             try {
+                if (fileContent[i] == null) continue;
                 /* If the representation is at the start of the line : this is the item that we want */
-                if (fileContentSplit[0].charAt(0) == this.mapRepresentation)
+                if (fileContent[i].charAt(0) == this.mapRepresentation)
                     /* Then we can return the attribute needed by the program */
-                    System.out.println(fileContentSplit[fileContentSplit.length - index]);
-                    return Integer.parseInt(fileContentSplit[fileContentSplit.length - index]);
+                    return Integer.parseInt(fileContent[i].split(" ")[fileContent[i].split(" ").length - index]);
             } catch (NumberFormatException e) {
                 System.err.println("ERROR: When parsing the measures of the map, can't find : " + element + " of " + this.name + ". Stopping !");
                 System.exit(1);
