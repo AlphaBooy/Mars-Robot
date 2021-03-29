@@ -154,6 +154,8 @@ public class CombatMap {
      * return the char at the given coordinates in the matrix
      */
     public char getChar(int x, int y) {
+    	if(x >= sizeX) x = sizeX-1;
+    	if(y >= sizeY) y = sizeY-1;
     	return map[x][y];
     }
     /*
@@ -246,7 +248,9 @@ public class CombatMap {
     	robotToRecharge.addEnergy(energyToGive);
     }
     
-
+    /*
+	 * Save the remainings robots after the end of the simulation
+	 */
     public void remainingBots()
     {
     	 File file = new File("files\\combat\\remaining");

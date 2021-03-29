@@ -81,14 +81,26 @@ public class Robot {
     	}
     	return res;
     }
+    /**
+   	 * 
+   	 * @return Return the robot's name
+   	 */
 
     public String getName() {
     	return name;
     }
+    /**
+   	 * 
+   	 * @return Return the robot's C value
+   	 */
     public int getC()
     {
     	return C;
     }
+    /**
+   	 * 
+   	 * @return Return the robot's energy
+   	 */
     public int getEnergy() {
     	return energy;
     }
@@ -100,6 +112,10 @@ public class Robot {
 	public int getCommandTotal(){
 		return commandLog.length;
 	}
+	 /**
+	 * Initialize the robot's command log
+	 * @param the name of the robot to initialize
+	 */
     public  void initBot(String name) {
     	File robotFile= new File("files\\combat\\bots\\" + name + ".txt");
     		
@@ -124,6 +140,25 @@ public class Robot {
    			e.printStackTrace();}
    		 
     }
+    /**
+	 * @param the value to complement
+	 * @return return the complement of the value for example returns 2(010) if we input 5(101)
+	 */
+    
+    public int complementInt(int value) {	
+    		int temp = value;
+    	long i = 1;
+    	while(i<=temp) {
+    		value ^=i;
+    		i<<=1;
+    	
+    		
+    	}
+    	return value;
+    }
+    /**
+	 * Execute the command located at the position C then add 1 to C
+	 */
     public void executeCommand(){
     	int x,y;
 
@@ -143,17 +178,17 @@ public class Robot {
     	    x %= 2;
     	    y %= 2;
     	    x &= y;
-    	    x = Integer.reverse(x);
+    	    x = complementInt(x);
     	    pStack.stack(x);
     	    System.out.printf("Action : g\n");
     	    break;
     	    
     	  case 'd':
-      	    this.D = pStack.unStack();
+      	    D = pStack.unStack();
       	  	System.out.printf("Action : d\n");
       	  	break;
     	  case 'm':
-      	   this.D = pStack.unStack();
+      	   commandLog[D] = pStack.unStack();
       	 System.out.printf("Action : m\n");
       	   break;
     	  case 'k':
