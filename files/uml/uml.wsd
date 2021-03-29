@@ -321,7 +321,7 @@ else "Instruction K"
     D -> D : D = 0
 else "Instruction Y"
     opt "V == 32"
-        robot -> Map : mur à droite ?
+        robot -> Map : position à droite disponible ?
         opt 
             Map --> robot : oui
             robot -> robot : reste à la même position
@@ -330,7 +330,7 @@ else "Instruction Y"
             robot -> robot : Déplace à droite
         end
     else "V == 33"
-        robot -> Map : mur en haut ?
+        robot -> Map : position en haut disponible ?
         opt 
             Map --> robot : oui
             robot -> robot : reste à la même position
@@ -339,7 +339,7 @@ else "Instruction Y"
             robot -> robot : Déplace en haut
         end
     else "V == 34"
-        robot -> Map : mur à gauche ?
+        robot -> Map : position à gauche disponible ?
         
         opt 
             Map --> robot : oui
@@ -349,7 +349,7 @@ else "Instruction Y"
             robot -> robot : Déplace à gauche
         end
     else "V == 35"
-        robot -> Map : mur en bas ?
+        robot -> Map : position en bas disponible ?
         opt 
             Map --> robot : oui
             robot -> robot : reste à la même position
@@ -359,26 +359,24 @@ else "Instruction Y"
         end
     else "V == 36"
         robot -> robot : Perd 1 point énergie
-        opt "énergie >= 0"
-            robot -> robot : Déstruction
+        opt "énergie <= 0"
+            robot -> robot : Destruction
             destroy robot
         end
     else "V == 37"
         robot -> Map : robots à côté ?
         Map --> robot : nombre robot
         robot -> robot : Gagne (nombre robot) point énergie
+        opt energie > 10
+            robot -> robot : energie = 10
+        end
     else "V == 38"
         robot-> Map : nombre mur à côté ? 
         Map --> robot : nombre mur
-        opt nombre mur = 0
-            robot -> robot : ne fait rien
-        else 
-            robot -> Map : Détruit murs
-            Map -> Map: enlève murs
-            robot -> robot : Perd (nombre mur) point énergie
-        end
-        opt "énergie >= 0"
-            robot -> robot : Déstruction
+        Map -> Map : détruit mur
+        robot -> robot : Perd (nombre mur) point énergie
+        opt "énergie <= 0"
+            robot -> robot : Destruction
             destroy robot
         end 
     end
@@ -388,7 +386,7 @@ else "instruction I"
     Map --> PP : donne valeur position (x, y)
     PP -> PP : empile valeur récupérée
 else "Instruction inconnue"
-    robot -> robot : Déstruction
+    robot -> robot : Destruction
     destroy robot
 end 
 @enduml
