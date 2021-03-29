@@ -167,24 +167,27 @@ state bougerRobot {
 
 digramm sequence 
 
-@startuml diagrammeSequence
+@startuml diagrammeSequencePart1
 title diagramme sequence partie 1
-actor Robot
-participant Map
+actor Robot as Robot <<Robot>>
+participant Map as Map <<Map>>
+activate Robot
+Robot -> Map : avancer(direction)
+alt position valide
+Map --> Robot : nouvelle position
+Robot -> Map : objet à la position ? 
 
-Robot -> Map : move
-alt position aviable
-Map -> Robot : new position
-Robot -> Map : object ? 
-
-alt yes 
-Map -> Robot : Object caracteristic
-Robot -> Map : i have destoyed the object
-else no
-Map -> Robot : empty case
+alt oui 
+Map --> Robot : caractéristique de l'objet
+Robot -> Map : j'ai détruit l'objet
+Map -> Map : enlève l'objet de la map
+else non
+Map --> Robot : case vide
 end
-else position no available
-Map -> Robot : Out of the map game over
+else position non disponible
+Map --> Robot : en dehors de la map\nfin du jeu
+destroy Robot
+deactivate Robot
 end
 @enduml
 
@@ -377,8 +380,6 @@ end
 
 
 //TODO
-diagram sequence partie1
-    ajouter les barres 
 diagram etat transution acheter equipement 
     revoir l'ordre des états avec le code 
 diagram sequence partie 2 
