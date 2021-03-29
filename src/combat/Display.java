@@ -110,8 +110,10 @@ public class Display extends Application {
                     }
                 });*/
                 //Actually execute the commands of all the robots
-                synchronized (rbs) {
-                    Iterator iterator = rbs.iterator(); // Must be in synchronized block
+                //A synchronized list and a synchronized block (iterator instead of for loop too) is necessary to avoid the java.util.ConcurrentModificationException
+                List list = Collections.synchronizedList(rbs);
+                synchronized (list) {
+                    Iterator iterator = list.iterator(); // Must be in synchronized block
                     while (iterator.hasNext()){
                         Robot rb = (Robot) iterator.next();
                         rb.executeCommand();
