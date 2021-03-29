@@ -134,17 +134,14 @@ title Diagramme cas partie 1
 :robot: as robot
 rectangle Projet {
 robot -(pointer une direction)
-robot - (revenir à la base)
-(décharger les objets) as (décharger)
-robot -- (décharger)
 (avancer) as (avancer)
 (miner) as (miner)
-(avancer) <. (miner): include
+(avancer) .> (miner): include
 robot -(avancer)
-robot - (miner)
-(installer nouveaux équipement) as (acheter)
+(acheter nouveaux équipement) as (acheter)
+(installer nouveaux équipement) as (installer)
 robot -- (acheter)
-(acheter) .> (décharger): include
+(acheter) .> (installer): include
 }
 @enduml
 
@@ -382,9 +379,6 @@ end
 //TODO
 diagram sequence partie1
     ajouter les barres 
-diagram cas partie 1 
-    le robot peut pas miner directement 
-    revoie au niveau de l'achat/installation des équipements
 diagram etat transution acheter equipement 
     revoir l'ordre des états avec le code 
 diagram sequence partie 2 
