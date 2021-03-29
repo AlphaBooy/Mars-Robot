@@ -5,6 +5,8 @@ import map.MapObject;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class Robot {
@@ -453,10 +455,13 @@ public class Robot {
         }
     }
 
-    public String[] getBestPath() {
-        boolean continuer= true;
+    public String[] getBestPath(int nbIteration) {
+
+        String[] resultPath = new String[nbIteration + 1];
+
         int posX = map.getBase().getPosX();
         int posY = map.getBase().getPosY();
+
         /* Build the list of all vertexes (all possible positions on the map) */
         ArrayList<String> vertexes = new ArrayList<>();
         for (int i = 0; i < map.getSizeY(); i++) {
@@ -485,10 +490,9 @@ public class Robot {
         ArrayList<Integer> illegalIndexes = new ArrayList<>();
         illegalIndexes.add(posX * posY + posX);
 
-        /* The maximum value on a line */
-        int max = 0;
+        int totalValue = 0;
         int index = 0;
-        while (index++ < 8) { // Exit on game over
+        while (index++ < nbIteration) {
             /* Calculate all positions that can be reached by the robot */
             int[] position_south = {posX, posY + 1};
             int[] position_north = {posX, posY - 1};
@@ -499,6 +503,9 @@ public class Robot {
             int index_north = (position_north[0] * position_north[1]) + position_north[0];
             int index_east = (position_east[0] * position_east[1]) + position_east[0];
             int index_west = (position_west[0] * position_west[1]) + position_west[0];
+
+            int oldX = posX, oldY = posY;
+
             /* Each map object has a value for the algorithm : The hardness and weight is a penalty but the value is a bonus */
 
             ArrayList<HashMap<Integer, String>> line = new ArrayList<>();
@@ -508,64 +515,95 @@ public class Robot {
                 line.add(null);
             }
 
-            if (!illegalIndexes.contains(index_south)) {
+            int value_south = 0;
+            int value_north = 0;
+            int value_east = 0;
+            int value_west = 0;
+
+            if (!illegalIndexes.contains(index_south) && position_south[0] < map.getSizeX() && position_south[1] < map.getSizeY()) {
                 MapObject mo_south = map.getObject(position_south[0], position_south[1]);
                 HashMap<Integer, String> lineElement_south = new HashMap<>();
-                int value_south = max + mo_south.getAttribute("value") - (mo_south.getAttribute("hardness") * 5) - mo_south.getAttribute("weight");
-                lineElement_south.put(value_south, position_south[0] + ":" + position_south[1]);
+                value_south = totalValue + mo_south.getAttribute("value") - (mo_south.getAttribute("hardness") * 5) - mo_south.getAttribute("weight");
+                lineElement_south.put(value_south, oldX + ":" + oldY + "=>" + position_south[0] + ":" + position_south[1]);
                 line.set(index_south, lineElement_south);
-                illegalIndexes.add(index_south);
             }
-            if (!illegalIndexes.contains(index_north)) {
+            if (!illegalIndexes.contains(index_north) && position_north[0] < map.getSizeX() && position_north[1] < map.getSizeY()) {
                 MapObject mo_north = map.getObject(position_north[0], position_north[1]);
                 HashMap<Integer, String> lineElement_north = new HashMap<>();
-                int value_north = max + mo_north.getAttribute("value") - (mo_north.getAttribute("hardness") * 5) - mo_north.getAttribute("weight");
-                lineElement_north.put(value_north, position_north[0] + ":" + position_north[1]);
+                value_north = totalValue + mo_north.getAttribute("value") - (mo_north.getAttribute("hardness") * 5) - mo_north.getAttribute("weight");
+                lineElement_north.put(value_north, oldX + ":" + oldY + "=>" + position_north[0] + ":" + position_north[1]);
                 line.set(index_north, lineElement_north);
-                illegalIndexes.add(index_north);
             }
-            if (!illegalIndexes.contains(index_east)) {
+            if (!illegalIndexes.contains(index_east) && position_east[0] < map.getSizeX() && position_east[1] < map.getSizeY()) {
                 MapObject mo_east = map.getObject(position_east[0], position_east[1]);
                 HashMap<Integer, String> lineElement_east = new HashMap<>();
-                int value_east = max + mo_east.getAttribute("value") - (mo_east.getAttribute("hardness") * 5) - mo_east.getAttribute("weight");
-                lineElement_east.put(value_east, position_east[0] + ":" + position_east[1]);
+                value_east = totalValue + mo_east.getAttribute("value") - (mo_east.getAttribute("hardness") * 5) - mo_east.getAttribute("weight");
+                lineElement_east.put(value_east, oldX + ":" + oldY + "=>" + position_east[0] + ":" + position_east[1]);
                 line.set(index_east, lineElement_east);
-                illegalIndexes.add(index_east);
             }
-            if (!illegalIndexes.contains(index_west)) {
+            if (!illegalIndexes.contains(index_west) && position_west[0] < map.getSizeX() && position_west[1] < map.getSizeY()) {
                 MapObject mo_west = map.getObject(position_west[0], position_west[1]);
                 HashMap<Integer, String> lineElement_west = new HashMap<>();
-                int value_west = max + mo_west.getAttribute("value") - (mo_west.getAttribute("hardness") * 5) - mo_west.getAttribute("weight");
-                lineElement_west.put(value_west, position_west[0] + ":" + position_west[1]);
+                value_west = totalValue + mo_west.getAttribute("value") - (mo_west.getAttribute("hardness") * 5) - mo_west.getAttribute("weight");
+                lineElement_west.put(value_west, oldX + ":" + oldY + "=>" + position_west[0] + ":" + position_west[1]);
                 line.set(index_west, lineElement_west);
-                illegalIndexes.add(index_west);
             }
 
-            for (int i = 0; i < line.size(); i++) {
-                if (line.get(i) == null) continue;
-                for (int key : line.get(i).keySet()) {
-                    if (max <= key && !illegalIndexes.contains(Integer.parseInt(line.get(i).get(key).split(":")[0]) *
-                                                                Integer.parseInt(line.get(i).get(key).split(":")[1]) +
-                                                                Integer.parseInt(line.get(i).get(key).split(":")[0]))) {
-                        max = key;
-                        posX = Integer.parseInt(line.get(i).get(key).split(":")[0]);
-                        posY = Integer.parseInt(line.get(i).get(key).split(":")[1]);
+            ArrayList<Integer> valueOrdered = new ArrayList<>();
+
+            for (int j = 1; j < allLines.size(); j++) {
+                for (int i = 0; i < allLines.get(j).size(); i++) {
+                    if (allLines.get(j).get(i) != null) {
+                        /* Get all values around (they're the HashMap keys) */
+                        for (int key : allLines.get(j).get(i).keySet()) {
+                            /* Add all elements to the value order list and sort it */
+                            valueOrdered.add(key);
+                            valueOrdered.sort((o1, o2) -> o2 - o1);
+                        }
                     }
                 }
             }
 
+            for (int j = 1; j < allLines.size(); j++) {
+                for (int i = 0; i < allLines.get(j).size(); i++) {
+                    if (allLines.get(j).get(i) != null) {
+                        /* Get all values around (they're the HashMap keys) */
+                        for (int key : allLines.get(j).get(i).keySet()) {
+                            /* Add all elements to the value order list and sort it */
+                            valueOrdered.add(key);
+                            valueOrdered.sort((o1, o2) -> o2 - o1);
+                            int currentIndex = Integer.parseInt(allLines.get(j).get(i).get(key).split("=>")[1].split(":")[0]) * Integer.parseInt(allLines.get(j).get(i).get(key).split("=>")[1].split(":")[1]) + Integer.parseInt(allLines.get(j).get(i).get(key).split("=>")[1].split(":")[0]);
+                            for (int valueMax : valueOrdered) {
+                                if (!illegalIndexes.contains(currentIndex) && allLines.get(j).get(i).get(valueMax) != null) {
+                                    posX = Integer.parseInt(allLines.get(j).get(i).get(valueMax).split("=>")[1].split(":")[0]);
+                                    posY = Integer.parseInt(allLines.get(j).get(i).get(valueMax).split("=>")[1].split(":")[1]);
+                                    if (valueMax == value_south) resultPath[index] = "TOURNER SUD,AVANCER";
+                                    if (valueMax == value_north) resultPath[index] = "TOURNER NORD,AVANCER";
+                                    if (valueMax == value_east) resultPath[index] = "TOURNER EST,AVANCER";
+                                    if (valueMax == value_west) resultPath[index] = "TOURNER OUEST,AVANCER";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            illegalIndexes.add(posX * posY + posX);
+
             allLines.add(line);
+
+            /* Print of the complete Matrix */
             System.out.println(vertexes.toString());
             allLines.forEach((lines) -> {
                 System.out.println(lines.toString());
             });
 
         }
-        return null;
+        return resultPath;
     }
 
     public static void main(String[] args) {
         Robot robot = new Robot();
-        robot.getBestPath();
+        System.out.println(Arrays.toString(robot.getBestPath(50)));
     }
 }
