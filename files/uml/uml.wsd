@@ -201,13 +201,14 @@ state AcheterMateriel {
     state c <<choice>>
     DemandeMateriel --> c : [position robot == position base]
 
-    c --> [*] : [false]
-    c --> AcheterEquipement : [true]
+    c --> [*] : [non]
+    c --> AcheterEquipement : [oui]
 
     state d <<choice>>
     AcheterEquipement --> d : [robot.value >= materiel.cost]
-    d --> [*] : [false]
-    d --> EquiperMateriel : [true]
+    d --> [*] : [non]
+    d --> EquiperMateriel : [oui]
+    EquiperMateriel : entry/robot.value -= materiel.cost
     EquiperMateriel : after(temps_installation)
     EquiperMateriel --> [*]
 
@@ -380,8 +381,6 @@ end
 
 
 //TODO
-diagram etat transution acheter equipement 
-    revoir l'ordre des états avec le code 
 diagram sequence partie 2 
     ajouter les barres
 diagram classe partie 2 
