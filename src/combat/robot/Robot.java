@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;  // Import this class to handle errors
 import java.io.FileReader;
 
 
+import combat.Display;
 import combat.map.CombatMap;
 import combat.map.IsNotARobotException;
 import robot.Direction;
@@ -192,7 +193,7 @@ public class Robot {
     			  System.out.printf("Action : y &\n");
         		  break;
         	default :
-        		System.out.printf("bruh\n");
+        		System.out.printf("bruh%d\n",D);
     		  }
     		  
       	    break;
@@ -254,20 +255,12 @@ public class Robot {
 		this.energy += value;
 		if(this.energy > 10)
 			this.energy = 10;
+		if(this.energy <= 0){
+			CombatMap map = CombatMap.getInstance();
+			map.destroyRobot(posX,posY);
 		}
-
-
-	
-	public void checkForDestruction() {
-		CombatMap map = CombatMap.getInstance();
-		if(this.energy<=0) {
-			map.destroyRobot(posX, posY);
-		}
+		Display.updateElement(posX,posY);
 	}
-
- 
- 
-
 }
 
 

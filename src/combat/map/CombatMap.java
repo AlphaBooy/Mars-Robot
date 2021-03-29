@@ -27,7 +27,7 @@ public class CombatMap {
     private final int energy_battery_value = 4;
     // A collection containing the names (and numbers) of robots to instantiate
    
-	private ArrayList<String> robotsNames =	 new ArrayList<String>(Arrays.asList("Curiosity","Discovery","Normandy"));
+	private ArrayList<String> robotsNames =	 new ArrayList<String>(Arrays.asList("Curiosity","Millenium","Discovery","Normandy"));
     /**	
      * The representation of the map as characters
      */
