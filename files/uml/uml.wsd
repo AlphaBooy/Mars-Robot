@@ -292,10 +292,11 @@ détruireMur --> [*]
 digramme sequence partie 2
 @startuml diagramSequencePart2
 title diagram sequence part2
-actor robot
-participant "Registre D" as D
-participant "Registre C" as C
-participant "Pile publique" as PP
+actor robot as robot <<Robot>>
+participant "Registre D" as D <<int[]>>
+participant "Registre C" as C <<int[]>>
+participant "Pile publique" as PP <<int[]>>
+participant Map as Map <<Map>>
 alt "Instruction P"
     D -> PP : donne valeur ASCII position d
     PP -> PP : empile la valeur
@@ -307,81 +308,93 @@ else "Instructin G"
     PP->PP : empile x &= y
 else "Instruction D"
     D -> PP : récupère dernière valeur
+    PP --> D : donne dernière valeur
     D -> D : définit D sur la \nvaleur récupérée
 else "Instruction M"
     D -> PP : demande dernière valeur
-    PP -> D : donne dernière valeur
-    D -> D : défninit valeur position d \nà la valeur récupérée
+    PP --> D : donne dernière valeur
+    D -> D : défninit valeur à \nla position d \nà la valeur récupérée
 else "Instruction K"
     C -> D : demande d
-    D -> D : donne d
+    D --> C : donne d
     C -> C : C = d
     D -> D : D = 0
 else "Instruction Y"
     opt "V == 32"
         robot -> Map : mur à droite ?
-        Map -> robot : oui/non
-        opt "mur à droite"
+        opt 
+            Map --> robot : oui
             robot -> robot : reste à la même position
-        else "Pas de mur"
+        else 
+            Map --> robot : non
             robot -> robot : Déplace à droite
         end
     else "V == 33"
         robot -> Map : mur en haut ?
-        Map -> robot : oui/non
-        opt "mur en haut"
+        opt 
+            Map --> robot : oui
             robot -> robot : reste à la même position
-        else "Pas de mur"
+        else 
+            Map --> robot : non
             robot -> robot : Déplace en haut
         end
     else "V == 34"
         robot -> Map : mur à gauche ?
-        Map -> robot : oui/non
-        opt "mur à gauche"
+        
+        opt 
+            Map --> robot : oui
             robot -> robot : reste à la même position
-        else "Pas de mur"
+        else 
+            Map --> robot : non
             robot -> robot : Déplace à gauche
         end
     else "V == 35"
         robot -> Map : mur en bas ?
-        Map -> robot : oui/non
-        opt "mur à bas"
+        opt 
+            Map --> robot : oui
             robot -> robot : reste à la même position
-        else "Pas de mur"
+        else 
+            Map --> robot : non
             robot -> robot : Déplace à bas
         end
     else "V == 36"
         robot -> robot : Perd 1 point énergie
         opt "énergie >= 0"
             robot -> robot : Déstruction
+            destroy robot
         end
     else "V == 37"
         robot -> Map : robots à côté ?
-        Map -> robot : nombre robot
+        Map --> robot : nombre robot
         robot -> robot : Gagne (nombre robot) point énergie
     else "V == 38"
         robot-> Map : nombre mur à côté ? 
-        Map -> robot : nombre mur
-        robot -> Map : Détruit mur
-        robot -> robot : Perd (nombre mur) point énergie
+        Map --> robot : nombre mur
+        opt nombre mur = 0
+            robot -> robot : ne fait rien
+        else 
+            robot -> Map : Détruit murs
+            Map -> Map: enlève murs
+            robot -> robot : Perd (nombre mur) point énergie
+        end
         opt "énergie >= 0"
             robot -> robot : Déstruction
+            destroy robot
         end 
     end
 else "instruction I"
     PP -> PP : dépile x, y
     PP -> Map : demande valeur position (x, y)
-    Map -> PP : donne valeur position (x, y)
+    Map --> PP : donne valeur position (x, y)
     PP -> PP : empile valeur récupérée
 else "Instruction inconnue"
     robot -> robot : Déstruction
+    destroy robot
 end 
 @enduml
 
 
 
 //TODO
-diagram sequence partie 2 
-    ajouter les barres
 diagram classe partie 2 
     A FAIRE 
