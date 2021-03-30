@@ -1,4 +1,3 @@
-rotate south,move,move,tourner ouest,avancer,avancer,tourner sud,avancer,avancer,avancer,avancer,avancer,avancer,avancer,
-avancer,tourner nord,avancer,avancer,avancer,avancer,avancer,avancer,avancer,tourner est,avancer,avancer,tourner nord,
+rotate south,move,move,tourner ouest,avancer,avancer,tourner sud,avancer,avancer,avancer,avancer,tourner nord,avancer,avancer,avancer,avancer,tourner est,avancer,avancer,tourner nord,
 avancer,avancer,avancer,acheter laser_a_plutonium,acheter batterie_avancée,tourner est,avancer,avancer,tourner nord,avancer,tourner est,
 avancer,avancer,tourner nord,avancer,tourner est,avancer,tourner nord,avancer

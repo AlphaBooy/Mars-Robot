@@ -235,7 +235,7 @@ public class Main extends Application {
         displayMaterial();
 
         /* Run given commands to the robot in a separate thread (different from the map generation thread) */
-        String[] actions = Robot.getActionsFromFile("files/actions/actions_1.txt");
+        String[] actions = Robot.getActionsFromFile("files/actions/best_actions.txt");
         makeActions(actions);
 
         BorderPane borderPane = new BorderPane(pane);

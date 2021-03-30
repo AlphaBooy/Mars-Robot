@@ -524,30 +524,42 @@ public class Robot {
             int value_east  = totalValue;
             int value_west  = totalValue;
 
+            /* If the south case isn't forbidden : */
             if (!illegalIndexes.contains(index_south) && position_south[0] < map.getSizeX() && position_south[1] < map.getSizeY() && position_south[0] > 0 && position_south[1] > 0) {
+                /* Get the map object at the south position so we can exploit it later */
                 MapObject mo_south = map.getObject(position_south[0], position_south[1]);
                 HashMap<Integer, String> lineElement_south = new HashMap<>();
+                /* The value is determined by the value of the block once mined but is reduced the harder the block is and the heavier it is */
                 value_south += mo_south.getAttribute("value") - (mo_south.getAttribute("hardness") * 5) - (mo_south.getAttribute("weight")) * 2;
                 lineElement_south.put(value_south, oldX + ":" + oldY + "=>" + position_south[0] + ":" + position_south[1]);
                 line.set(index_south, lineElement_south);
             }
+            /* If the north case isn't forbidden : */
             if (!illegalIndexes.contains(index_north) && position_north[0] < map.getSizeX() && position_north[1] < map.getSizeY() && position_north[0] > 0 && position_north[1] > 0) {
+                /* Get the map object at the north position so we can exploit it later */
                 MapObject mo_north = map.getObject(position_north[0], position_north[1]);
                 HashMap<Integer, String> lineElement_north = new HashMap<>();
+                /* The value is determined by the value of the block once mined but is reduced the harder the block is and the heavier it is */
                 value_north += mo_north.getAttribute("value") - (mo_north.getAttribute("hardness") * 5) - (mo_north.getAttribute("weight")) * 2;
                 lineElement_north.put(value_north, oldX + ":" + oldY + "=>" + position_north[0] + ":" + position_north[1]);
                 line.set(index_north, lineElement_north);
             }
+            /* If the east case isn't forbidden : */
             if (!illegalIndexes.contains(index_east) && position_east[0] < map.getSizeX() && position_east[1] < map.getSizeY() && position_east[0] > 0 && position_east[1] > 0) {
+                /* Get the map object at the east position so we can exploit it later */
                 MapObject mo_east = map.getObject(position_east[0], position_east[1]);
                 HashMap<Integer, String> lineElement_east = new HashMap<>();
+                /* The value is determined by the value of the block once mined but is reduced the harder the block is and the heavier it is */
                 value_east += mo_east.getAttribute("value") - (mo_east.getAttribute("hardness") * 5) - (mo_east.getAttribute("weight")) * 2;
                 lineElement_east.put(value_east, oldX + ":" + oldY + "=>" + position_east[0] + ":" + position_east[1]);
                 line.set(index_east, lineElement_east);
             }
+            /* If the west case isn't forbidden : */
             if (!illegalIndexes.contains(index_west) && position_west[0] < map.getSizeX() && position_west[1] < map.getSizeY() && position_west[0] > 0 && position_west[1] > 0) {
+                /* Get the map object at the west position so we can exploit it later */
                 MapObject mo_west = map.getObject(position_west[0], position_west[1]);
                 HashMap<Integer, String> lineElement_west = new HashMap<>();
+                /* The value is determined by the value of the block once mined but is reduced the harder the block is and the heavier it is */
                 value_west += mo_west.getAttribute("value") - (mo_west.getAttribute("hardness") * 5) - (mo_west.getAttribute("weight")) * 2;
                 lineElement_west.put(value_west, oldX + ":" + oldY + "=>" + position_west[0] + ":" + position_west[1]);
                 line.set(index_west, lineElement_west);
@@ -557,39 +569,31 @@ public class Robot {
             allLines.add(line);
 
             /* Order the list of all values by the amount of point gained if the robot is moving to this position */
-            ArrayList<HashMap<String, Integer>> valueOrdered = new ArrayList<>();
-            HashMap<String, Integer> valueElement = new HashMap<>();
+            TreeMap<Integer, String> valueOrdered = new TreeMap<>();
             for (int j = 1; j < allLines.size(); j++) {
                 for (int i = 0; i < allLines.get(j).size(); i++) {
                     if (allLines.get(j).get(i) != null) {
                         /* Get all values around (they're the HashMap keys) */
                         for (int key : allLines.get(j).get(i).keySet()) {
                             /* Add all elements to the value order list */
-                            valueElement.put(allLines.get(j).get(i).get(key), key);
-                            valueOrdered.add(valueElement);
+                            valueOrdered.put(key, allLines.get(j).get(i).get(key));
                         }
                     }
                 }
             }
-            /* Sort all values descending (the first value in the list will be the one the robot want to mine if possible) */
-            valueOrdered.sort(new Comparator<>() {
-                @Override
-                public int compare(HashMap<String, Integer> o1, HashMap<String, Integer> o2) {
-                    return Collections.max(o1.values()) - Collections.max(o2.values());
-                }
-            });
 
-            for (HashMap<String, Integer> element : valueOrdered) {
-                for (String key : element.keySet()) {
-                    if (!illegalIndexes.contains((Integer.parseInt(key.split("=>")[1].split(":")[0]) * Integer.parseInt(key.split("=>")[1].split(":")[1])) + Integer.parseInt(key.split("=>")[1].split(":")[0]))) {
-                        posX = Integer.parseInt(key.split("=>")[1].split(":")[0]);
-                        posY = Integer.parseInt(key.split("=>")[1].split(":")[1]);
-                        oldX = Integer.parseInt(key.split("=>")[0].split(":")[0]);
-                        oldY = Integer.parseInt(key.split("=>")[0].split(":")[1]);
-                    }
+            valueOrdered.descendingMap();
+
+            for (int key : valueOrdered.keySet()) {
+                if (!illegalIndexes.contains((Integer.parseInt(valueOrdered.get(key).split("=>")[1].split(":")[0]) * Integer.parseInt(valueOrdered.get(key).split("=>")[1].split(":")[1])) + Integer.parseInt(valueOrdered.get(key).split("=>")[1].split(":")[0]))) {
+                    posX = Integer.parseInt(valueOrdered.get(key).split("=>")[1].split(":")[0]);
+                    posY = Integer.parseInt(valueOrdered.get(key).split("=>")[1].split(":")[1]);
+                    oldX = Integer.parseInt(valueOrdered.get(key).split("=>")[0].split(":")[0]);
+                    oldY = Integer.parseInt(valueOrdered.get(key).split("=>")[0].split(":")[1]);
                 }
             }
 
+            /* Calculate the value corresponding to the best path */
             if (posY > oldY && posX == oldX) {
                 totalValue = value_south;
             } else if (posY < oldY && posX == oldX) {
@@ -600,15 +604,13 @@ public class Robot {
                 totalValue = value_west;
             }
 
+            /* Adding the best position to the path */
             positionPath.add(posX + ":" + posY);
-            System.out.println("OLD POS = " + oldX + ":" + oldY);
-            System.out.println("MAX POS = " + posX + ":" + posY);
-
+            /* Adding the current index to the illegals positions for later iterations */
             illegalIndexes.add(posX * posY + posX);
-
-            System.out.println(positionPath.toString());
-
         }
+
+        /* For each path positions, calculate the correct actions to reach each positions */
         for (int i = 1; i < positionPath.size(); i++) {
             int oldX = Integer.parseInt(positionPath.get(i - 1).split(":")[0]);
             int oldY = Integer.parseInt(positionPath.get(i - 1).split(":")[1]);
@@ -633,6 +635,7 @@ public class Robot {
             }
             resultPath[i] = "TOURNER " + direction + ",AVANCER";
         }
+        /* Removing all "null" elements to return a correct value understandable by the robot */
         for (String path : resultPath) {
             if (path != null) {
                 result.add(path);
