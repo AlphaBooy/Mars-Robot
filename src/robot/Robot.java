@@ -630,27 +630,39 @@ public class Robot {
             int positionY = Integer.parseInt(positionPath.get(i).split(":")[1]);
 
             /* Simulate the battery to know if we have to return to the base to recharge or not */
-            //this.battery.useBattery((this.map.getObject(posX,posY).getAttribute("hardness") * 100) / this.laser.getPower());
+            this.battery.useBattery((this.map.getObject(posX,posY).getAttribute("hardness") * 100) / this.laser.getPower());
 
-            if (this.battery.getLevel() < 35) { // if the battery is at a critical level :
+            if (this.battery.getLevel() < 45) { // if the battery reach a critical level :
                 /* Save the current progression */
                 for (String path : resultPath) {
                     if (path != null) {
                         result.add(path);
+                        result.add("AVANCER");
                     }
                 }
                 /* Save the progression in a reverse path */
                 for (int k = resultPath.length - 1; k > 0; k--) {
                     if (resultPath[k] != null) {
                         /* Inverse the directions so the robot make the reverse path */
-                        if (resultPath[k].split(",")[0] == "TOURNER SUD")
-                            result.add("TOURNER NORD,AVANCER");
-                        if (resultPath[k].split(",")[0] == "TOURNER NORD")
-                            result.add("TOURNER SUD,AVANCER");
-                        if (resultPath[k].split(",")[0] == "TOURNER EST")
-                            result.add("TOURNER OUEST,AVANCER");
-                        if (resultPath[k].split(",")[0] == "TOURNER OUEST")
-                            result.add("TOURNER EST,AVANCER");
+                        if (resultPath[k].equals("TOURNER SUD"))
+                            result.add("TOURNER NORD");
+                        if (resultPath[k].equals("TOURNER NORD"))
+                            result.add("TOURNER SUD");
+                        if (resultPath[k].equals("TOURNER EST"))
+                            result.add("TOURNER OUEST");
+                        if (resultPath[k].equals("TOURNER OUEST"))
+                            result.add("TOURNER EST");
+                        result.add("AVANCER");
+                    }
+                }
+                /* Once on the base : buy a new battery */
+                result.add("ACHETER batterie_avancée");
+                this.battery = new Battery("batterie_avancée", 180);
+                /* get back at the old position */
+                for (String path : resultPath) {
+                    if (path != null) {
+                        result.add(path);
+                        result.add("AVANCER");
                     }
                 }
                 resultPath = new String[nbIteration + 1]; // Empty the path, we have saved the progress so far
