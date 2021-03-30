@@ -391,6 +391,121 @@ else "Instruction inconnue"
 end 
 @enduml
 
+diagramme classe partie 2 
+@startuml diagramClassPart2
+title Diagramme classe partie 2
+
+
+
+
+package combat {
+    package robot {
+        class Robot
+        class PublicStack
+    }
+    package map {
+        class CombatMap
+        class IsNotARobotException
+    }
+    class Display
+    class CombatMain
+}
+
+class Robot {
+    -energy : int
+    -posY : int
+    -posX : int
+    - C :int
+    -D: int
+    -commandLog : int[]
+    -name: String
+    +Robot(chosenName : String, posX: int, posY: int): Robot 
+    +getPosY(): int
+    +getPoxX(): int
+    +getCommand(): int
+    +getCLogAsString(): String
+    +getName(): String
+    +getC(): int
+    +getEnergy(): int
+    +getCommandTotal(): int
+    +initBot(name: String): void 
+    +complementInt(value: int): int
+    +executeCommand(): void
+    +moveRobot(dir: Direction): void
+    +addEnergy(value: int): void
+}
+
+class PublicStack {
+    - stack: int[]
+    -p: int
+    - {static} instance: PublicStack
+    + {static} getInstance(): PublicStack
+    - PublicStack()
+    +getP(): int
+    +getSatck(pos: int): int
+    +stack(value :int): void
+    +unStack(): int
+}
+
+class CombatMap {
+    -path: String
+    -sizeX: int
+    -sizeY: int
+    -energy_battery_value: int
+    -robotsNames: ArrayList<String>
+    -map: char[][]
+    -robots: ArrayList<Robot>
+    - {static} turnCount: int
+    -{static} MAX_TURN: int
+    -{static} instance: CombatMap
+    +getInstanc(): CombatMap
+    -CombatMap()
+    +getSizeX(): int
+    +getSizeY(): int
+    +getMap(): char[][]
+    +getRobots(): ArrayList<Robots>
+    +displayMap(): void
+    +showMap(): void
+    +getChar(x: int, y: int): char
+    +setChat(x: int, y: int, c: char): void
+    +moveContent(x1: int, y1: int, x2: int, y2: int): boolean
+    +damageRobots(x: int, y: int): void
+    +rechargeRobots(x: int, y: int): void
+    +remainingBots(): void
+    +destroyWalls(x: int, y: int): void
+    +destroyRobots(x: int, y: int)
+    +isPosValid(x: int, y: int): boolean
+    +getRobot(x: int, y: int) :Robot
+    +turn(): char
+    +getLongestComman(): int
+}
+
+class Display {
+    +{static} main:(args: String[]): void
+    +{static} pane: GridPane
+    +{static} map: CombatMap
+    +{static} block_size: int
+    +{static} STAGE_HEIGHT: int
+    +{static} STAGE_WIDTH: int
+    +{static} WAIT_BETWEEN_ACTIONS: int
+    +{static} generateTexture(x: int, y: int): void
+    - {static} getPathFromPos(x: int, y: int): String
+    +{static} makeActions(): void
+    +{static} updateElement(x: int, y: int): void
+    +start(primaryStage: Stage): void
+}
+
+class CombatMain{
+    +{static} main(args: String[]): void
+}
+
+Display --|> Application
+IsNotARobotException --|> Exception
+Display *-- CombatMap
+CombatMap *-- Robot
+CombatMain -- CombatMap
+CombatMain -- PublicStack
+@enduml
 
 
 //TODO
