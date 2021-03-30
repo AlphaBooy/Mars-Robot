@@ -8,9 +8,10 @@ diagram needed for all parts (we need 10 diagrams):
 - séquence 
 - état-transition (2) ✅(1/2)
 
-@startuml test 
+@startuml diagrammeClassePart1 
 title digramme classe partie 1
 class Robot {
+    {static}+ BEST_RUN: String
     -config : HashMap<String, Double>
     -direction :Direction
     -laser : Laser
@@ -20,9 +21,14 @@ class Robot {
     -posY: int
     -value : double
     -weightCarried: double
+    {static}+ FILES_MATERIAL_MATERIAL_LIST_1_TXT: String
+    {static}+ FILES_RESULTS_CURRENT_NUMBER: String
     {static} +PATH_TO_IMAGE: String
-    +Robot(configPath: String)
-    +Robot(map: Map, configPath: String)
+    {static} + ACCELERATION_FACTOR: int
+    {static} + CHEMIN_CONFIG: String
+    +Robot(): Robot
+    +Robot(configPath: String): Robot
+    +Robot(map: Map, configPath: String): Robot
     +getDirection(): Direction
     +getPosX(): int
     +getPosY(): int
@@ -30,7 +36,8 @@ class Robot {
     +getLaser() : Laser
     +getBattery(): Battery
     +getWeightCarried(): double
-    +{static} getConfig: HashMap<String, double>
+    + getConfig(): HashMap<String, double>
+    +{static} getConfig(path: String): HashMap<String, double>
     +rotate(direction: Direction): void
     +move(): void
     +performAction(instructions: String...): void
@@ -39,21 +46,26 @@ class Robot {
     +gameover(): void
     +writeInResult(resultToWrite: String): void
     +getActionDuration(action: String)
+    +buyMaterial(materialName: String): void
     +{static} startGame(): void
     -{static} getCurrentRunNumber(): int
-    -{static} setCurrentRunNumber(): void
+    -{static} setCurrentNumber(): void
+    +getBestPath(nbIteration: int): String[]
 }
 
 class Material {
     -object: Object
     -cost: int
-    +Material(object: Object, cost: int)
+    +Material(object: Object, cost: int): Material
+    +Material(name: String, path: String): Material
     +getDefault(): Material[]
     +getAllMaterial(path: String): ArrayList<Material>
     +isLaser(name String): boolean
     +isBattery(name: String): boolean
     +getName(): String
+    +getCost(): int
     +getObject(): Object
+    +getMaterialAttributes(path: String, name: String, attribute: String): int
 }
 
 class Battery {
@@ -66,6 +78,9 @@ class Battery {
     +chargeBattery(power: double): void
     +useBattery(power: double): void
     +getImageName(): String
+    +getLevel(): double
+    +getCapacity(): double
+    +getName(): String
     -emptyBattery(): void
 
 }
@@ -91,7 +106,6 @@ class Map {
     -sizeY: int
     -map: MapObject[][]
     +Map()
-    +Map(sizeX: int, sizeY: int)
     +Map(representation: char[][])
     +generateObjects(): void
     +getRepresentation(): char[][]
@@ -116,15 +130,15 @@ class MapObject {
     +getPosY(): int
     +getAttribute(element: String): int
     +destroy(): void
-    {static}+ getObject(posX: int, posY: int): MapObject
+    -readMapObjectsFile(path: String): String[]
 }
 
 Robot *-- Battery
 Robot *-- Laser
 Robot o-- Map
 Map o-- MapObject
-Material <|-- Laser
-Material <|-- Battery
+Material -- Laser
+Material -- Battery
 Robot o-- Direction
 @enduml
 
@@ -133,15 +147,15 @@ diagram cas
 title Diagramme cas partie 1
 :robot: as robot
 rectangle Projet {
-robot -(pointer une direction)
+robot --(pointer une direction)
 (avancer) as (avancer)
 (miner) as (miner)
-(avancer) .> (miner): include
-robot -(avancer)
+(avancer) ..> (miner): include
+robot --(avancer)
 (acheter nouveaux équipement) as (acheter)
 (installer nouveaux équipement) as (installer)
 robot -- (acheter)
-(acheter) .> (installer): include
+(acheter) ..> (installer): include
 }
 @enduml
 
@@ -157,7 +171,7 @@ state bougerRobot {
     Avancer --> [*]
     state miner {
         [*] --> mine 
-        mine : after(durreté *100 / efficacité)
+        mine : after(dureté *100 / efficacité)
         mine --> [*]
     }
     miner -> [*] : [charge robot > charge max]
@@ -168,26 +182,35 @@ state bougerRobot {
 digramm sequence 
 
 @startuml diagrammeSequencePart1
+!pragma teoz true
 title diagramme sequence partie 1
 actor Robot as Robot <<Robot>>
 participant Map as Map <<Map>>
-activate Robot
+
 Robot -> Map : avancer(direction)
 alt position valide
 Map --> Robot : nouvelle position
 Robot -> Map : objet à la position ? 
 
 alt oui 
-Map --> Robot : caractéristique de l'objet
+
+Map --> Robot: caractéristique de l'objet
+Robot -> Robot ++: mine
+deactivate Robot
 Robot -> Map : j'ai détruit l'objet
+
 Map -> Map : enlève l'objet de la map
 else non
+activate Robot
 Map --> Robot : case vide
+deactivate Robot
+
+
 end
 else position non disponible
 Map --> Robot : en dehors de la map\nfin du jeu
 destroy Robot
-deactivate Robot
+
 end
 @enduml
 
@@ -220,6 +243,7 @@ diagramme cas (part2)
 title Diagramme cas partie 2
 actor :robot:
 rectangle programme {
+    left to right direction
 robot -- (Instruction P)
 robot -- (Instruction G)
 robot -- (Instruction D)
@@ -243,6 +267,7 @@ diagramme etat transition partie 2
 @startuml
 title diagramme etat transition instruction Y (part2)
 state c <<choice>>
+state RobotDetruit
 [*] --> c : instruction Y
 c --> bougerRobot : [32 <= V <= 35]
 state bougerRobot {
@@ -263,11 +288,10 @@ c --> attaquerRobots : [V == 36]
 state attaquerRobots {
     [*] --> energieInitiale
     energieInitiale --> energieFinale : attaque/energie --
-    energieFinale  --> [*] : [energie > 0]
-    energieFinale --> robotDetruit 
+    energieFinale  --> [*]
+    energieFinale --> RobotDetruit : [energie <= 0]
 }
 attaquerRobots --> [*]
-
 c --> soignerRobots : [V == 37]
 state soignerRobots {
     [*] --> energieRobotInitiale
@@ -284,14 +308,14 @@ state détruireMur {
     [*] --> energieRobotDébut
     energieRobotDébut --> energieRobotFin : détruitMur/ énergie -= nbMur
     energieRobotFin --> [*]
-    energieRobotFin --> robotDétruit : [energie <: 0]
+    energieRobotFin --> RobotDetruit : [energie <= 0]
 }
 détruireMur --> [*]
 @enduml
 
 digramme sequence partie 2
-@startuml diagramSequencePart2
-title diagram sequence part2
+@startuml diagrammeSequencePart2
+title diagramme sequence part2
 actor robot as robot <<Robot>>
 participant "Registre D" as D <<int[]>>
 participant "Registre C" as C <<int[]>>
@@ -319,6 +343,7 @@ else "Instruction K"
     D --> C : donne d
     C -> C : C = d
     D -> D : D = 0
+    newpage
 else "Instruction Y"
     opt "V == 32"
         robot -> Map : position à droite disponible ?
@@ -380,6 +405,7 @@ else "Instruction Y"
             destroy robot
         end 
     end
+    newpage
 else "instruction I"
     PP -> PP : dépile x, y
     PP -> Map : demande valeur position (x, y)
@@ -406,9 +432,11 @@ package combat {
     package map {
         class CombatMap
         class IsNotARobotException
+        enum Direction{
+            NORTH, SOUTH, WEST, EAST
+        }
     }
     class Display
-    class CombatMain
 }
 
 class Robot {
@@ -425,11 +453,9 @@ class Robot {
     +getCommand(): int
     +getCLogAsString(): String
     +getName(): String
-    +getC(): int
     +getEnergy(): int
     +getCommandTotal(): int
     +initBot(name: String): void 
-    +complementInt(value: int): int
     +executeCommand(): void
     +moveRobot(dir: Direction): void
     +addEnergy(value: int): void
@@ -443,6 +469,7 @@ class PublicStack {
     - PublicStack()
     +getP(): int
     +getSatck(pos: int): int
+    +setStack(value: int): void
     +stack(value :int): void
     +unStack(): int
 }
@@ -458,14 +485,13 @@ class CombatMap {
     - {static} turnCount: int
     -{static} MAX_TURN: int
     -{static} instance: CombatMap
-    +getInstanc(): CombatMap
+    {static}+getInstance(): CombatMap
     -CombatMap()
     +getSizeX(): int
     +getSizeY(): int
     +getMap(): char[][]
     +getRobots(): ArrayList<Robots>
     +displayMap(): void
-    +showMap(): void
     +getChar(x: int, y: int): char
     +setChat(x: int, y: int, c: char): void
     +moveContent(x1: int, y1: int, x2: int, y2: int): boolean
@@ -476,8 +502,7 @@ class CombatMap {
     +destroyRobots(x: int, y: int)
     +isPosValid(x: int, y: int): boolean
     +getRobot(x: int, y: int) :Robot
-    +turn(): char
-    +getLongestComman(): int
+    +getLongestCommand(): int
 }
 
 class Display {
@@ -493,21 +518,19 @@ class Display {
     +{static} makeActions(): void
     +{static} updateElement(x: int, y: int): void
     +start(primaryStage: Stage): void
+    +{static} performActions(rbs: ArrayList<Robot>): void
+    +{static} waitAMoment(): void
 }
 
-class CombatMain{
-    +{static} main(args: String[]): void
-}
+
 
 Display --|> Application
 IsNotARobotException --|> Exception
 Display *-- CombatMap
 CombatMap *-- Robot
-CombatMain -- CombatMap
-CombatMain -- PublicStack
+Robot -- Direction
+
+
 @enduml
 
 
-//TODO
-diagram classe partie 2 
-    A FAIRE 
