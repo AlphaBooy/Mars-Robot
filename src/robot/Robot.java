@@ -206,37 +206,42 @@ public class Robot {
      */
     public void performActions(String... instructions) {
         for (String instruction : instructions) {
-            switch (instruction.toLowerCase().split(" ")[0]) {
-                case "move": case "avancer":
-                    this.move();
-                    writeInResult("AVANCER,");
-                    break;
-                case "rotate": case "tourner":
-                    switch (instruction.toLowerCase().split(" ")[1]) {
-                        case "south", "sud" -> {
-                            this.rotate(Direction.SOUTH);
-                            writeInResult("TOURNER SUD,");
+            if (instruction != null) {
+                switch (instruction.toLowerCase().split(" ")[0]) {
+                    case "move":
+                    case "avancer":
+                        this.move();
+                        writeInResult("AVANCER,");
+                        break;
+                    case "rotate":
+                    case "tourner":
+                        switch (instruction.toLowerCase().split(" ")[1]) {
+                            case "south", "sud" -> {
+                                this.rotate(Direction.SOUTH);
+                                writeInResult("TOURNER SUD,");
+                            }
+                            case "north", "nord" -> {
+                                this.rotate(Direction.NORTH);
+                                writeInResult("TOURNER NORD,");
+                            }
+                            case "east", "est" -> {
+                                this.rotate(Direction.EAST);
+                                writeInResult("TOURNER EST,");
+                            }
+                            case "west", "ouest" -> {
+                                this.rotate(Direction.WEST);
+                                writeInResult("TOURNER OUEST,");
+                            }
                         }
-                        case "north", "nord" -> {
-                            this.rotate(Direction.NORTH);
-                            writeInResult("TOURNER NORD,");
-                        }
-                        case "east", "est" -> {
-                            this.rotate(Direction.EAST);
-                            writeInResult("TOURNER EST,");
-                        }
-                        case "west", "ouest" -> {
-                            this.rotate(Direction.WEST);
-                            writeInResult("TOURNER OUEST,");
-                        }
-                    }
-                    break;
-                case "acheter": case "buy":
-                    buyMaterial(instruction.toLowerCase().split(" ")[1]);
-                    writeInResult("ACHETER " + instruction.toUpperCase().split(" ")[1] + ",");
-                    break;
-                default:
-                    gameOver();
+                        break;
+                    case "acheter":
+                    case "buy":
+                        buyMaterial(instruction.toLowerCase().split(" ")[1]);
+                        writeInResult("ACHETER " + instruction.toUpperCase().split(" ")[1] + ",");
+                        break;
+                    default:
+                        gameOver();
+                }
             }
         }
     }
@@ -259,6 +264,8 @@ public class Robot {
         } catch (IOException e) {
             System.err.println("ERROR: The file describing the actions is missing or can't be reached." +
                     "Please, make sure the program can access to \"" + path + "\"");
+            Robot robot = new Robot();
+            return robot.getBestPath(100);
         }
         return fileContent.split(",");
     }
@@ -351,19 +358,24 @@ public class Robot {
      * @return The duration of the action given in argument
      */
     public double getActionDuration(String action) {
-        switch (action.toLowerCase().split(" ")[0]) {
-            case "move": case "avancer":
-                /* If the robot evolve on a broken map object or on the base */
-                if (map.getObject(this.posX, this.posY).getName() == "void" || map.getObject(this.posX, this.posY).getName() == "base") {
-                    return (this.config.get("temps_deplacement_vide")) / ACCELERATION_FACTOR;
-                }
-                /* If the robot need to mine the map element to progress on the map */
-                MapObject mo = map.getObject(this.posX, this.posY);
-                return ((mo.getAttribute("hardness") * 100) / this.laser.getPower()) / ACCELERATION_FACTOR;
-            case "rotate": case "tourner":
-                return this.config.get("temps_rotation") / ACCELERATION_FACTOR;
-            case "acheter": case "buy":
-                return this.getConfig().get("temps_installation") * 1000 / ACCELERATION_FACTOR;
+        if (action != null) {
+            switch (action.toLowerCase().split(" ")[0]) {
+                case "move":
+                case "avancer":
+                    /* If the robot evolve on a broken map object or on the base */
+                    if (map.getObject(this.posX, this.posY).getName() == "void" || map.getObject(this.posX, this.posY).getName() == "base") {
+                        return (this.config.get("temps_deplacement_vide")) / ACCELERATION_FACTOR;
+                    }
+                    /* If the robot need to mine the map element to progress on the map */
+                    MapObject mo = map.getObject(this.posX, this.posY);
+                    return ((mo.getAttribute("hardness") * 100) / this.laser.getPower()) / ACCELERATION_FACTOR;
+                case "rotate":
+                case "tourner":
+                    return this.config.get("temps_rotation") / ACCELERATION_FACTOR;
+                case "acheter":
+                case "buy":
+                    return this.getConfig().get("temps_installation") * 1000 / ACCELERATION_FACTOR;
+            }
         }
         return 0;
     }
@@ -454,7 +466,7 @@ public class Robot {
         }
     }
 
-    public ArrayList<String> getBestPath(int nbIteration) {
+    public String[] getBestPath(int nbIteration) {
 
         String[] resultPath = new String[nbIteration + 1];
         ArrayList<String> positionPath = new ArrayList<>();
@@ -617,6 +629,33 @@ public class Robot {
             int positionX = Integer.parseInt(positionPath.get(i).split(":")[0]);
             int positionY = Integer.parseInt(positionPath.get(i).split(":")[1]);
 
+            /* Simulate the battery to know if we have to return to the base to recharge or not */
+            //this.battery.useBattery((this.map.getObject(posX,posY).getAttribute("hardness") * 100) / this.laser.getPower());
+
+            if (this.battery.getLevel() < 35) { // if the battery is at a critical level :
+                /* Save the current progression */
+                for (String path : resultPath) {
+                    if (path != null) {
+                        result.add(path);
+                    }
+                }
+                /* Save the progression in a reverse path */
+                for (int k = resultPath.length - 1; k > 0; k--) {
+                    if (resultPath[k] != null) {
+                        /* Inverse the directions so the robot make the reverse path */
+                        if (resultPath[k].split(",")[0] == "TOURNER SUD")
+                            result.add("TOURNER NORD,AVANCER");
+                        if (resultPath[k].split(",")[0] == "TOURNER NORD")
+                            result.add("TOURNER SUD,AVANCER");
+                        if (resultPath[k].split(",")[0] == "TOURNER EST")
+                            result.add("TOURNER OUEST,AVANCER");
+                        if (resultPath[k].split(",")[0] == "TOURNER OUEST")
+                            result.add("TOURNER EST,AVANCER");
+                    }
+                }
+                resultPath = new String[nbIteration + 1]; // Empty the path, we have saved the progress so far
+            }
+
             String direction = "NORD";
 
             if (oldY + 1 == positionY && oldX == positionX) { // We moved south from the last know position
@@ -633,19 +672,21 @@ public class Robot {
                 i--;
                 continue;
             }
-            resultPath[i] = "TOURNER " + direction + ",AVANCER";
+            this.battery.useBattery(this.config.get("cout_rotation"));
+            resultPath[i] = "TOURNER " + direction;
         }
         /* Removing all "null" elements to return a correct value understandable by the robot */
         for (String path : resultPath) {
             if (path != null) {
                 result.add(path);
+                result.add("AVANCER");
             }
         }
-        return result;
+        return result.toArray(new String[0]);
     }
 
     public static void main(String[] args) {
         Robot robot = new Robot();
-        System.out.println(robot.getBestPath(50).toString());
+        System.out.println(Arrays.toString(robot.getBestPath(50)));
     }
 }

@@ -122,5 +122,6 @@ public class Battery {
     private void emptyBattery() {
         this.level = 0;
         System.out.println("the game is over !");
+        System.exit(1);
     }
 }
