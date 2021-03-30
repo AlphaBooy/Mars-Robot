@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Scanner;
 
 import combat.Display;
 import combat.robot.Robot;
@@ -35,7 +34,7 @@ public class CombatMap {
     
     // The array of robots currently presents on the map
     private ArrayList<Robot> robots;
-    private static int turnCount =0;
+    private int turnCount =0;
     
     public static final int MAX_TURN = 20;
 
@@ -255,13 +254,14 @@ public class CombatMap {
 	 */
     public void remainingBots()
     {
+    	 // clear the directory containing remaining robot from previous simulation
     	 File file = new File("files\\combat\\remaining");
     	 file.delete();
+    	 
+    	 // recreate the directory
     	  try {
 
     	    Path path = Paths.get("files\\combat\\remaining");
-
-    	    //java.nio.file.Files;
     	    Files.createDirectories(path);
 
 
@@ -270,14 +270,14 @@ public class CombatMap {
     	    System.err.println("Failed to create directory!" + e.getMessage());
 
     	  }
-
+    	 // save the robots into the directory
     	for (int i=0;i<robots.size();i++) {
 		Robot rb = robots.get(i);
     	try {
 		      FileWriter myWriter = new FileWriter("files\\combat\\remaining\\" + rb.getName() + ".txt");
 		      myWriter.write(rb.getName() + ' '+ rb.getCLogAsString());
 		      myWriter.close();
-		      System.out.println("Successfully wrote to the file.");
+		      System.out.println("Successfully wrote "+ rb.getName()+" to the file.");
 		    } catch (IOException e) {
 		      System.out.println("An error occurred.");
 		      e.printStackTrace();
@@ -354,6 +354,11 @@ public class CombatMap {
     		throw new IsNotARobotException("No robot found at the coordinates " + x + ";" + y);
     	return rb;
     }
+    
+    /**
+     * 
+     * 
+     */
     public char turn() {
 		char endFlag = 0;
     	/*Scanner sc = new Scanner(System.in);

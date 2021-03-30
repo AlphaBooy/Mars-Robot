@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+
 
 public class Display extends Application {
 
@@ -117,8 +117,11 @@ public class Display extends Application {
                     while (iterator.hasNext()){
                         Robot rb = (Robot) iterator.next();
                         rb.executeCommand();
+                        
                     }
+                    for(int k = 0 ;k< rbs.size();k++)rbs.get(k).addEnergy(0);
                 }
+                
                 //We wait for a certain amount of time before performing another action
                 try {
                     Thread.sleep(WAIT_BETWEEN_ACTIONS);

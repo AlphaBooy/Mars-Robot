@@ -2,7 +2,6 @@ package combat.robot;
 import java.io.BufferedReader;
 
 import java.io.File;  // Import the File class
-import java.io.FileNotFoundException;  // Import this class to handle errors
 import java.io.FileReader;
 
 
@@ -174,12 +173,12 @@ public class Robot {
       	  	break;
     	  case 'm':
       	   commandLog[D] = pStack.unStack();
-      	 System.out.printf("Action : m\n");
+      	   System.out.printf("Action : m\n");
       	   break;
     	  case 'k':
     		  C = D;
     		  D = 0;
-        	   System.out.printf("Action : k\n");
+        	  System.out.printf("Action : k\n");
       	    break;
     	  case 'y':
     		  switch(D)
@@ -203,7 +202,7 @@ public class Robot {
     		  case '$' :
     			 map.damageRobots(posX,posY);
     			 System.out.printf("Action : y $\n");
-        		  break;
+        		 break;
     		  case '%' :
     			  map.rechargeRobots(posX, posY);
     			  System.out.printf("Action : y %\n");
@@ -213,7 +212,7 @@ public class Robot {
     			  System.out.printf("Action : y &\n");
         		  break;
         	default :
-        		map.destroyRobot(posX,posY);
+        		this.energy = 0;
     		  }
     		  
       	    break;
@@ -226,7 +225,7 @@ public class Robot {
       	  	System.out.printf("Action : i\n");
       	    break;
     	  default:
-    		  map.destroyRobot(posX,posY);
+    		  this.energy = 0;
     	    break;
     	}
     	this.C++;
