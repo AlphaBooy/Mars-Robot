@@ -13,9 +13,9 @@ import robot.Direction;
 public class Robot {
 
 	private int energy;
-    /** The X position of the robot (supposed to evolve) */
+    /** The X position of the robot */
     private int posX;
-    /** The Y position of the robot (supposed to evolve) */
+    /** The Y position of the robot */
     private int posY;
     /** The robot's C record */
     private int C;
@@ -23,15 +23,19 @@ public class Robot {
     private int D;
     /** The robot's command log */
     private int commandLog[];
-    
+    /** The robot's name **/
     private String name;
-   
 
-    
 
-    public Robot(String chosenName, int posX, int posY) {
+	/**
+	 * The object robot that will be contained in the map, it is represented with a '@'
+	 * @param chosenName robot's name
+	 * @param posX pos x on the map matrix
+	 * @param posY pos y on the map matrix
+	 */
+	public Robot(String chosenName, int posX, int posY) {
 		this.name = chosenName;
-		this.energy = 10;
+		this.energy = 5;
 		this.posX = posX;
 		this.posY = posY;
 		this.D = 0;
@@ -90,14 +94,6 @@ public class Robot {
     }
     /**
    	 * 
-   	 * @return Return the robot's C value
-   	 */
-    public int getC()
-    {
-    	return C;
-    }
-    /**
-   	 * 
    	 * @return Return the robot's energy
    	 */
     public int getEnergy() {
@@ -113,7 +109,7 @@ public class Robot {
 	}
 	 /**
 	 * Initialize the robot's command log
-	 * @param the name of the robot to initialize
+	 * @param name of the robot to initialize
 	 */
     public  void initBot(String name) {
     	File robotFile= new File("files\\combat\\bots\\" + name + ".txt");
@@ -205,14 +201,14 @@ public class Robot {
         		 break;
     		  case '%' :
     			  map.rechargeRobots(posX, posY);
-    			  System.out.printf("Action : y %\n");
+    			  System.out.println("Action : y %");
         		  break;
     		  case '&' :
     			  map.destroyWalls(posX, posY);
     			  System.out.printf("Action : y &\n");
         		  break;
         	default :
-        		this.energy = 0;
+				map.destroyRobot(posX,posY);
     		  }
     		  
       	    break;
@@ -225,7 +221,7 @@ public class Robot {
       	  	System.out.printf("Action : i\n");
       	    break;
     	  default:
-    		  this.energy = 0;
+    		  map.destroyRobot(posX,posY);
     	    break;
     	}
     	this.C++;
@@ -260,7 +256,7 @@ public class Robot {
 			throw new IllegalArgumentException("The given direction is unknown.");
 		}
 		}catch(IsNotARobotException e) {
-			System.err.println("ERROR: There was an atempt to move a non robot position " + e.getMessage());
+			System.err.println("ERROR: There was an attempt to move a non robot position " + e.getMessage());
 		}
     }
 	/*

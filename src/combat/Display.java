@@ -21,9 +21,6 @@ import combat.robot.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 
 public class Display extends Application {
@@ -36,9 +33,9 @@ public class Display extends Application {
     public static CombatMap map = CombatMap.getInstance();
     public static int block_size = 25;
 
-    public static int STAGE_HEIGHT = 800; //The height of the window
-    public static int STAGE_WIDTH = 800; //The width of the window
-    public static int WAIT_BETWEEN_ACTIONS = 500; //The amount of time in milliseconds waited between every actions
+    public static int STAGE_HEIGHT = 1080; //The height of the window
+    public static int STAGE_WIDTH = 1920; //The width of the window
+    public static int WAIT_BETWEEN_ACTIONS = 1000; //The amount of time in milliseconds waited between every actions
 
     /**
      * Display a texture depending of the name of the map object found in the map matrix.
@@ -48,16 +45,17 @@ public class Display extends Application {
      * @param y the position of the object on the Y axis
      */
     public static void generateTexture(int x, int y) {
+        String path = getPathFromPos(x,y);
         try {
             /* Create an image with the given texture for each position of each representations */
-            Image image = new Image(new FileInputStream(getPathFromPos(x,y)));
+            Image image = new Image(new FileInputStream(path));
             ImageView iv = new ImageView(image);
             /* Set the size of each parcel to it feet a good looking view. */
             iv.setFitHeight(block_size);
             iv.setFitWidth(block_size);
             pane.add(iv, x, y);
         } catch (FileNotFoundException e) {
-            System.err.println("WARNING: You've given a bad texture file/name. A default texture as" +
+            System.err.println("WARNING: You've given a bad texture file/name : " + path + ". A default texture as" +
                     "been displayed but please change it as soon as possible to avoid further display issues.");
         }
     }
@@ -94,45 +92,53 @@ public class Display extends Application {
         return "textures/combat/" + fileName + ".png";
     }
 
-
+    /**
+     * Run through all the available commands and execute the commands, while more than one robot is alive
+     */
     public static void makeActions() {
         Runnable task = () -> {
             ArrayList<Robot> rbs = map.getRobots();
             int i = 0;
-            while (i < (map).getLongestCommand()) {
-/*                //The following code is run after the action is performed and update the Graphical Interface
-                Platform.runLater(() -> {
-                    for (int x = 0; x < map.getSizeX(); x++) {
-                        for (int y = 0; y < map.getSizeY(); y++) {
-                            *//* Add each images on the given x:y position in the pane *//*
-                            generateTexture(x,y);
-                        }
-                    }
-                });*/
-                //Actually execute the commands of all the robots
-                //A synchronized list and a synchronized block (iterator instead of for loop too) is necessary to avoid the java.util.ConcurrentModificationException
-                List list = Collections.synchronizedList(rbs);
-                synchronized (list) {
-                    Iterator iterator = list.iterator(); // Must be in synchronized block
-                    while (iterator.hasNext()){
-                        Robot rb = (Robot) iterator.next();
-                        rb.executeCommand();
-                        
-                    }
-                    for(int k = 0 ;k< rbs.size();k++)rbs.get(k).addEnergy(0);
-                }
-                
-                //We wait for a certain amount of time before performing another action
-                try {
-                    Thread.sleep(WAIT_BETWEEN_ACTIONS);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            while (rbs.size() > 1 && i < (map).getLongestCommand()) {
+                performActions(rbs);
+                waitAMoment();
+                rbs = map.getRobots();
                 i++;
+            }
+            System.out.println("The game is over, there are "+ rbs.size() + " robots still alive :");
+            if(rbs.size() > 0){
+                for(Robot rb : rbs){
+                    System.out.println("    -" + rb.getName());
+                }
+            }else{
+                System.out.println("There is no winner, everyone DIED");
             }
         };
         /* Start the new thread */
         new Thread(task).start();
+    }
+
+    /**
+     * Perform the actions for all the robots, need to be synchronized because each action happen after the previous one
+     * @param rbs list containing the robots
+     */
+    private static synchronized void performActions(ArrayList<Robot> rbs){
+        //Actually execute the commands of all the robots
+        for(int i = 0; i < rbs.size();i++){
+            rbs.get(i).executeCommand();
+        }
+    }
+
+    /**
+     * Wait for a certain amount of time before the next action to allow the user to see changes in the ui
+     */
+    private static void waitAMoment(){
+        //We wait for a certain amount of time before performing another action
+        try {
+            Thread.sleep(WAIT_BETWEEN_ACTIONS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -141,18 +147,11 @@ public class Display extends Application {
      * @param y
      */
     public static void updateElement(int x, int y){
-        Runnable task = () -> {
-            //The following code is run after the action is performed and update the Graphical Interface
-            Platform.runLater(() -> {
-                generateTexture(x,y);
-            });
-        };
-        /* Start the new thread */
-        new Thread(task).start();
+        //The following code is run after the action is performed and update the Graphical Interface
+        Platform.runLater(() -> {
+            generateTexture(x,y);
+        });
     }
-
-
-
 
     @Override
     public void start(Stage primaryStage) {
@@ -177,8 +176,6 @@ public class Display extends Application {
 
         //Run the thread that will perform actions and update the GUI
         makeActions();
-
-
 
         BorderPane borderPane = new BorderPane(pane);
         /* Add the GridPane into the scene panel */

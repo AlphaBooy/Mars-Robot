@@ -25,13 +25,9 @@ public class CombatMap {
     // the energy given by the batteries (represented by '%') on the map
     private final int energy_battery_value = 4;
     // A collection containing the names (and numbers) of robots to instantiate
-   
-	private ArrayList<String> robotsNames =	 new ArrayList<String>(Arrays.asList("Curiosity","Millenium","Discovery","Normandy"));
-    /**	
-     * The representation of the map as characters
-     */
+	private ArrayList<String> robotsNames =	 new ArrayList<String>(Arrays.asList("Curiosity","Discovery","Millenium","Normandy"));
+    //The representation of the map as characters
     private char [][] map;
-    
     // The array of robots currently presents on the map
     private ArrayList<Robot> robots;
     private int turnCount =0;
@@ -62,8 +58,11 @@ public class CombatMap {
     	return instance;
     	
     }
-    
-    private CombatMap() {
+
+	/**
+	 * Initialise a new map reading the file containing the characters
+	 */
+	private CombatMap() {
         File file = new File(path);
 
         try (FileReader fr = new FileReader(file)) {
@@ -141,15 +140,7 @@ public class CombatMap {
         }
     }
 
-    public void showMap(){
-		for (int i = 0; i < sizeX; i++) {
-			for (int j = 0; j < sizeY; j++) {
-				Display.generateTexture(i,j);
-			}
-		}
-	}
-
-    /*
+    /**
      * return the char at the given coordinates in the matrix
      */
     public char getChar(int x, int y) {
@@ -159,7 +150,7 @@ public class CombatMap {
     	if(y < 0) y = 0;
     	return map[x][y];
     }
-    /*
+    /**
      * Set the char c at the given coordinates in the matrix
      */
     public void setChar(int x, int y, char c) {
@@ -249,7 +240,7 @@ public class CombatMap {
     	robotToRecharge.addEnergy(energyToGive);
     }
     
-    /*
+    /**
 	 * Save the remainings robots after the end of the simulation
 	 */
     public void remainingBots()
@@ -353,42 +344,6 @@ public class CombatMap {
     	if(rb == null)
     		throw new IsNotARobotException("No robot found at the coordinates " + x + ";" + y);
     	return rb;
-    }
-    
-    /**
-     * 
-     * 
-     */
-    public char turn() {
-		char endFlag = 0;
-    	/*Scanner sc = new Scanner(System.in);
-    	char c = sc.next().charAt(0);*/
-		int c = 0;
-   
-    	if(c < 10)
-    	{
-    		if(turnCount == MAX_TURN)
-    		{
-    			endFlag = 's';
-    		}
-    		else
-    		{
-    		for (Robot rb : robots) {
-
-    			 rb.executeCommand();
-    			 
-            }
-    		//DisplayMap();
-    		this.turnCount++;
-    		}
-    		c++;
-    	}
-    	if(c > 10)
-    	{
-    	 endFlag = 's';
-    	}
-    	return endFlag;
-    	
     }
 
 	/***
