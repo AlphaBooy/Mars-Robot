@@ -155,7 +155,9 @@ public class CombatMap {
      */
     public char getChar(int x, int y) {
     	if(x >= sizeX) x = sizeX-1;
+    	if(x < 0) x = 0;
     	if(y >= sizeY) y = sizeY-1;
+    	if(y < 0) y = 0;
     	return map[x][y];
     }
     /*
@@ -369,6 +371,7 @@ public class CombatMap {
     		for (Robot rb : robots) {
 
     			 rb.executeCommand();
+    			 
             }
     		//DisplayMap();
     		this.turnCount++;

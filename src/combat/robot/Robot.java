@@ -140,22 +140,7 @@ public class Robot {
    			e.printStackTrace();}
    		 
     }
-    /**
-	 * @param the value to complement
-	 * @return return the complement of the value for example returns 2(010) if we input 5(101)
-	 */
-    
-    public int complementInt(int value) {	
-    		int temp = value;
-    	long i = 1;
-    	while(i<=temp) {
-    		value ^=i;
-    		i<<=1;
-    	
-    		
-    	}
-    	return value;
-    }
+ 
     /**
 	 * Execute the command located at the position C then add 1 to C
 	 */
@@ -178,7 +163,7 @@ public class Robot {
     	    x %= 2;
     	    y %= 2;
     	    x &= y;
-    	    x = complementInt(x);
+    	    x = ~x;
     	    pStack.stack(x);
     	    System.out.printf("Action : g\n");
     	    break;
@@ -228,7 +213,7 @@ public class Robot {
     			  System.out.printf("Action : y &\n");
         		  break;
         	default :
-        		System.out.printf("bruh%d\n",D);
+        		map.destroyRobot(posX,posY);
     		  }
     		  
       	    break;
@@ -240,11 +225,8 @@ public class Robot {
       	  	pStack.stack(map.getChar(x, y));
       	  	System.out.printf("Action : i\n");
       	    break;
-			case -1:
-				System.out.println("The robot is out of commands !");
-				break;
     	  default:
-    	    this.energy = 0;
+    		  map.destroyRobot(posX,posY);
     	    break;
     	}
     	this.C++;
