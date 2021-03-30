@@ -4,10 +4,7 @@ import map.Map;
 import map.MapObject;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 
 public class Robot {
     public static final String BEST_RUN = "files/results/best_run";
@@ -30,7 +27,7 @@ public class Robot {
     public static final String FILES_MATERIAL_MATERIAL_LIST_1_TXT = "files/material/material_list_1.txt";
     public static final String FILES_RESULTS_CURRENT_NUMBER = "files/results/current_number.txt";
     public static final String PATH_TO_IMAGE = "textures/robot.png";
-    public static final int ACCELERATION_FACTOR = 1;
+    public static final int ACCELERATION_FACTOR = 10;
     private static final String CHEMINCONFIG = "files/robot/config_1.txt";
 
     /**
@@ -144,6 +141,8 @@ public class Robot {
      * @param direction The new direction the robot will be facing (NORTH, SOUTH, EAST, WEST).
      */
     public void rotate(Direction direction){
+        if (direction == this.direction)
+            return;
         /* Update the battery by the amount of battery taken by a robot rotation. If battery < 0 : the game is over */
         this.battery.useBattery(this.config.get("cout_rotation"));
         try {
@@ -455,9 +454,11 @@ public class Robot {
         }
     }
 
-    public String[] getBestPath(int nbIteration) {
+    public ArrayList<String> getBestPath(int nbIteration) {
 
         String[] resultPath = new String[nbIteration + 1];
+        ArrayList<String> positionPath = new ArrayList<>();
+        ArrayList<String> result = new ArrayList<>();
 
         int posX = map.getBase().getPosX();
         int posY = map.getBase().getPosY();
@@ -490,6 +491,8 @@ public class Robot {
         ArrayList<Integer> illegalIndexes = new ArrayList<>();
         illegalIndexes.add(posX * posY + posX);
 
+        positionPath.add("19:6"); // Position of the base as the first position in the path
+
         int totalValue = 0;
         int index = 0;
         while (index++ < nbIteration) {
@@ -504,6 +507,7 @@ public class Robot {
             int index_east = (position_east[0] * position_east[1]) + position_east[0];
             int index_west = (position_west[0] * position_west[1]) + position_west[0];
 
+            /* Saving the new position of the robot to register the movement */
             int oldX = posX, oldY = posY;
 
             /* Each map object has a value for the algorithm : The hardness and weight is a penalty but the value is a bonus */
@@ -515,95 +519,130 @@ public class Robot {
                 line.add(null);
             }
 
-            int value_south = 0;
-            int value_north = 0;
-            int value_east = 0;
-            int value_west = 0;
+            int value_south = totalValue;
+            int value_north = totalValue;
+            int value_east  = totalValue;
+            int value_west  = totalValue;
 
-            if (!illegalIndexes.contains(index_south) && position_south[0] < map.getSizeX() && position_south[1] < map.getSizeY()) {
+            if (!illegalIndexes.contains(index_south) && position_south[0] < map.getSizeX() && position_south[1] < map.getSizeY() && position_south[0] > 0 && position_south[1] > 0) {
                 MapObject mo_south = map.getObject(position_south[0], position_south[1]);
                 HashMap<Integer, String> lineElement_south = new HashMap<>();
-                value_south = totalValue + mo_south.getAttribute("value") - (mo_south.getAttribute("hardness") * 5) - mo_south.getAttribute("weight");
+                value_south += mo_south.getAttribute("value") - (mo_south.getAttribute("hardness") * 5) - (mo_south.getAttribute("weight")) * 2;
                 lineElement_south.put(value_south, oldX + ":" + oldY + "=>" + position_south[0] + ":" + position_south[1]);
                 line.set(index_south, lineElement_south);
             }
-            if (!illegalIndexes.contains(index_north) && position_north[0] < map.getSizeX() && position_north[1] < map.getSizeY()) {
+            if (!illegalIndexes.contains(index_north) && position_north[0] < map.getSizeX() && position_north[1] < map.getSizeY() && position_north[0] > 0 && position_north[1] > 0) {
                 MapObject mo_north = map.getObject(position_north[0], position_north[1]);
                 HashMap<Integer, String> lineElement_north = new HashMap<>();
-                value_north = totalValue + mo_north.getAttribute("value") - (mo_north.getAttribute("hardness") * 5) - mo_north.getAttribute("weight");
+                value_north += mo_north.getAttribute("value") - (mo_north.getAttribute("hardness") * 5) - (mo_north.getAttribute("weight")) * 2;
                 lineElement_north.put(value_north, oldX + ":" + oldY + "=>" + position_north[0] + ":" + position_north[1]);
                 line.set(index_north, lineElement_north);
             }
-            if (!illegalIndexes.contains(index_east) && position_east[0] < map.getSizeX() && position_east[1] < map.getSizeY()) {
+            if (!illegalIndexes.contains(index_east) && position_east[0] < map.getSizeX() && position_east[1] < map.getSizeY() && position_east[0] > 0 && position_east[1] > 0) {
                 MapObject mo_east = map.getObject(position_east[0], position_east[1]);
                 HashMap<Integer, String> lineElement_east = new HashMap<>();
-                value_east = totalValue + mo_east.getAttribute("value") - (mo_east.getAttribute("hardness") * 5) - mo_east.getAttribute("weight");
+                value_east += mo_east.getAttribute("value") - (mo_east.getAttribute("hardness") * 5) - (mo_east.getAttribute("weight")) * 2;
                 lineElement_east.put(value_east, oldX + ":" + oldY + "=>" + position_east[0] + ":" + position_east[1]);
                 line.set(index_east, lineElement_east);
             }
-            if (!illegalIndexes.contains(index_west) && position_west[0] < map.getSizeX() && position_west[1] < map.getSizeY()) {
+            if (!illegalIndexes.contains(index_west) && position_west[0] < map.getSizeX() && position_west[1] < map.getSizeY() && position_west[0] > 0 && position_west[1] > 0) {
                 MapObject mo_west = map.getObject(position_west[0], position_west[1]);
                 HashMap<Integer, String> lineElement_west = new HashMap<>();
-                value_west = totalValue + mo_west.getAttribute("value") - (mo_west.getAttribute("hardness") * 5) - mo_west.getAttribute("weight");
+                value_west += mo_west.getAttribute("value") - (mo_west.getAttribute("hardness") * 5) - (mo_west.getAttribute("weight")) * 2;
                 lineElement_west.put(value_west, oldX + ":" + oldY + "=>" + position_west[0] + ":" + position_west[1]);
                 line.set(index_west, lineElement_west);
             }
 
-            ArrayList<Integer> valueOrdered = new ArrayList<>();
+            /* Adding the new generated line (with all possible options for the next move) to the allLines array */
+            allLines.add(line);
 
+            /* Order the list of all values by the amount of point gained if the robot is moving to this position */
+            ArrayList<HashMap<String, Integer>> valueOrdered = new ArrayList<>();
+            HashMap<String, Integer> valueElement = new HashMap<>();
             for (int j = 1; j < allLines.size(); j++) {
                 for (int i = 0; i < allLines.get(j).size(); i++) {
                     if (allLines.get(j).get(i) != null) {
                         /* Get all values around (they're the HashMap keys) */
                         for (int key : allLines.get(j).get(i).keySet()) {
-                            /* Add all elements to the value order list and sort it */
-                            valueOrdered.add(key);
-                            valueOrdered.sort((o1, o2) -> o2 - o1);
+                            /* Add all elements to the value order list */
+                            valueElement.put(allLines.get(j).get(i).get(key), key);
+                            valueOrdered.add(valueElement);
                         }
+                    }
+                }
+            }
+            /* Sort all values descending (the first value in the list will be the one the robot want to mine if possible) */
+            valueOrdered.sort(new Comparator<>() {
+                @Override
+                public int compare(HashMap<String, Integer> o1, HashMap<String, Integer> o2) {
+                    return Collections.max(o1.values()) - Collections.max(o2.values());
+                }
+            });
+
+            for (HashMap<String, Integer> element : valueOrdered) {
+                for (String key : element.keySet()) {
+                    if (!illegalIndexes.contains((Integer.parseInt(key.split("=>")[1].split(":")[0]) * Integer.parseInt(key.split("=>")[1].split(":")[1])) + Integer.parseInt(key.split("=>")[1].split(":")[0]))) {
+                        posX = Integer.parseInt(key.split("=>")[1].split(":")[0]);
+                        posY = Integer.parseInt(key.split("=>")[1].split(":")[1]);
+                        oldX = Integer.parseInt(key.split("=>")[0].split(":")[0]);
+                        oldY = Integer.parseInt(key.split("=>")[0].split(":")[1]);
                     }
                 }
             }
 
-            for (int j = 1; j < allLines.size(); j++) {
-                for (int i = 0; i < allLines.get(j).size(); i++) {
-                    if (allLines.get(j).get(i) != null) {
-                        /* Get all values around (they're the HashMap keys) */
-                        for (int key : allLines.get(j).get(i).keySet()) {
-                            /* Add all elements to the value order list and sort it */
-                            valueOrdered.add(key);
-                            valueOrdered.sort((o1, o2) -> o2 - o1);
-                            int currentIndex = Integer.parseInt(allLines.get(j).get(i).get(key).split("=>")[1].split(":")[0]) * Integer.parseInt(allLines.get(j).get(i).get(key).split("=>")[1].split(":")[1]) + Integer.parseInt(allLines.get(j).get(i).get(key).split("=>")[1].split(":")[0]);
-                            for (int valueMax : valueOrdered) {
-                                if (!illegalIndexes.contains(currentIndex) && allLines.get(j).get(i).get(valueMax) != null) {
-                                    posX = Integer.parseInt(allLines.get(j).get(i).get(valueMax).split("=>")[1].split(":")[0]);
-                                    posY = Integer.parseInt(allLines.get(j).get(i).get(valueMax).split("=>")[1].split(":")[1]);
-                                    if (valueMax == value_south) resultPath[index] = "TOURNER SUD,AVANCER";
-                                    if (valueMax == value_north) resultPath[index] = "TOURNER NORD,AVANCER";
-                                    if (valueMax == value_east) resultPath[index] = "TOURNER EST,AVANCER";
-                                    if (valueMax == value_west) resultPath[index] = "TOURNER OUEST,AVANCER";
-                                }
-                            }
-                        }
-                    }
-                }
+            if (posY > oldY && posX == oldX) {
+                totalValue = value_south;
+            } else if (posY < oldY && posX == oldX) {
+                totalValue = value_north;
+            } else if (posX > oldX && posY == oldY) {
+                totalValue = value_east;
+            } else if (posX < oldX && posY == oldY) {
+                totalValue = value_west;
             }
+
+            positionPath.add(posX + ":" + posY);
+            System.out.println("OLD POS = " + oldX + ":" + oldY);
+            System.out.println("MAX POS = " + posX + ":" + posY);
 
             illegalIndexes.add(posX * posY + posX);
 
-            allLines.add(line);
-
-            /* Print of the complete Matrix */
-            System.out.println(vertexes.toString());
-            allLines.forEach((lines) -> {
-                System.out.println(lines.toString());
-            });
+            System.out.println(positionPath.toString());
 
         }
-        return resultPath;
+        for (int i = 1; i < positionPath.size(); i++) {
+            int oldX = Integer.parseInt(positionPath.get(i - 1).split(":")[0]);
+            int oldY = Integer.parseInt(positionPath.get(i - 1).split(":")[1]);
+            int positionX = Integer.parseInt(positionPath.get(i).split(":")[0]);
+            int positionY = Integer.parseInt(positionPath.get(i).split(":")[1]);
+
+            String direction = "NORD";
+
+            if (oldY + 1 == positionY && oldX == positionX) { // We moved south from the last know position
+                direction = "SUD";
+            } else if (oldY - 1 == positionY && oldX == positionX) { // We moved north from the last know position
+                direction = "NORD";
+            } else if (oldX + 1 == positionX && oldY == positionY) { // We moved east from the last know position
+                direction = "EST";
+            } else if (oldX - 1 == positionX && oldY == positionY) { // We moved west from the last know position
+                direction = "OUEST";
+            } else { // We're starting again from a previous position
+                positionPath.remove(i - 1);
+                resultPath[i - 1] = null;
+                i--;
+                continue;
+            }
+            resultPath[i] = "TOURNER " + direction + ",AVANCER";
+        }
+        for (String path : resultPath) {
+            if (path != null) {
+                result.add(path);
+            }
+        }
+        return result;
     }
 
     public static void main(String[] args) {
         Robot robot = new Robot();
-        System.out.println(Arrays.toString(robot.getBestPath(50)));
+        System.out.println(robot.getBestPath(50).toString());
     }
 }
