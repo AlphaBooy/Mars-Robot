@@ -8,7 +8,7 @@ import java.io.FileReader;
 import combat.Display;
 import combat.map.CombatMap;
 import combat.map.IsNotARobotException;
-import robot.Direction;
+import combat.map.Direction;
 
 public class Robot {
 
@@ -35,7 +35,7 @@ public class Robot {
 	 */
 	public Robot(String chosenName, int posX, int posY) {
 		this.name = chosenName;
-		this.energy = 5;
+		this.energy = 10;
 		this.posX = posX;
 		this.posY = posY;
 		this.D = 0;
