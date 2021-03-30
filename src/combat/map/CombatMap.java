@@ -263,18 +263,17 @@ public class CombatMap {
     	  }
     	 // save the robots into the directory
     	for (int i=0;i<robots.size();i++) {
-		Robot rb = robots.get(i);
-    	try {
-		      FileWriter myWriter = new FileWriter("files\\combat\\remaining\\" + rb.getName() + ".txt");
-		      myWriter.write(rb.getName() + ' '+ rb.getCLogAsString());
-		      myWriter.close();
-		      System.out.println("Successfully wrote "+ rb.getName()+" to the file.");
-		    } catch (IOException e) {
-		      System.out.println("An error occurred.");
-		      e.printStackTrace();
-		    }
-    }
-    	
+			Robot rb = robots.get(i);
+			try {
+				  FileWriter myWriter = new FileWriter("files\\combat\\remaining\\" + rb.getName() + ".txt");
+				  myWriter.write(rb.getName() + ' '+ rb.getCLogAsString());
+				  myWriter.close();
+				  System.out.println("Successfully wrote "+ rb.getName()+" to the file.");
+				} catch (IOException e) {
+				  System.out.println("An error occurred.");
+				  e.printStackTrace();
+				}
+   		 }
     }
  
     /**

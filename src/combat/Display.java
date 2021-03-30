@@ -105,13 +105,10 @@ public class Display extends Application {
                 rbs = map.getRobots();
                 i++;
             }
-            System.out.println("The game is over, there are "+ rbs.size() + " robots still alive :");
-            if(rbs.size() > 0){
-                for(Robot rb : rbs){
-                    System.out.println("    -" + rb.getName());
-                }
-            }else{
-                System.out.println("There is no winner, everyone DIED");
+            System.out.println("The game is over, there is/are "+ rbs.size() + " robot(s) still alive :");
+            map.remainingBots();
+            if(rbs.size() == 0){
+                System.out.println("There is no winner, they all DIED");
             }
         };
         /* Start the new thread */
